@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <form>
+        Doctor Name:-
+        <br>
+        <input type="text" name="doctorName" id="doctorName">
+        <br>Mobile Number:-
+        <br>
+        <input type="text" name="mobileNumber" id="mobileNumber">
+        <br> Department Name:-
+        <br>
+        <input type="text" name="departmentName" id="departmentName">
+        <br>
+        <input type="button" value="submit" id="submit">
+        <div id="successMessage"> </div>
+    </form>
+    <script>
+    $(document).ready(function() {
+        $("#submit").click(function() {
+            var doctorName = $("#doctorName").val();
+            var mobileNumber = $("#mobileNumber").val();
+            var departmentName = $("#departmentName").val();
+            $.ajax({
+                url: "http://localhost:8080/user/create",
+                type: 'post',
+                data: {
+                    userName: 'shekhar',
+                    fullName: 'shekhar Tyagi',
+                    mobileNumber: '8126',
+                    profilePicture: '12331',
+                    password: '23123',
+                    profession: 'profession',
+                    website: 'website',
+                    age: 'age',
+                    bio: 'bio',
+                    email: 'email',
+                },
+                success: function(data) {
+                    $("#successMessage").text(JSON.stringify(data));
+                }
+
+            });
+        })
+    });
+    </script>
+</body>
+
+</html>
