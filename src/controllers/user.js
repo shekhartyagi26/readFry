@@ -37,7 +37,12 @@ export class UserController extends BaseAPIController {
                 data = { email: email, password: password }
                 User.findOne(req.users, data)
                     .then((data) => {
-                        res.json({ data })
+                        if (data) {
+                            res.json({ data })
+                        } else {
+                            throw new Error(res.json(400, { message: 'Invalid Login Credentials' }));
+                        }
+
                     }).catch((err) => {
                         throw new Error(res.json(400, { message: err }));
                     })

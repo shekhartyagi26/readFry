@@ -30,7 +30,7 @@
             var mobileNumber = $("#mobileNumber").val();
             var departmentName = $("#departmentName").val();
             $.ajax({
-                url: "http://localhost:8080/user/login",
+                url: "http://localhost:3001/user/login",
                 type: 'post',
                 data: {
                     userName: 'shekhar',
@@ -42,7 +42,7 @@
                     website: 'website',
                     age: 'age',
                     bio: 'bio',
-                    email: 'shekhartyagi26@gmail.com',
+                    email: 'shekhartyagi26@gmail.co',
                 },
                 success: function(data) {
                     $("#successMessage").text(JSON.stringify(data));
