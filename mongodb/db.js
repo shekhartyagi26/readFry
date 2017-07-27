@@ -5,11 +5,11 @@ module.exports = function() {
     // create schema
     let model_schema_user = mongoose.Schema({}, {
         strict: false,
-        collection: 'users'
+        collection: 'User'
     });
-    let CollectionModel_user = conn.model('users', model_schema_user);
+    let CollectionModel_user = conn.model('User', model_schema_user);
     return function(req, res, next) {
-        req.users = CollectionModel_user;
+        req.User = CollectionModel_user;
         next();
     };
 };

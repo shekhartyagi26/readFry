@@ -1,6 +1,8 @@
 import BaseAPIController from "./BaseAPIController";
 import UserProvider from "../providers/UserProvider.js";
 import User from "../models/User.js";
+import generatePassword from 'password-generator';
+import crypto from 'crypto';
 
 export class UserController extends BaseAPIController {
     /* Controller for User Register  */
@@ -9,10 +11,10 @@ export class UserController extends BaseAPIController {
         UserProvider.checkBlank([userName, fullName, mobileNumber, profilePicture, password, profession, website, age, bio, email])
             .then((data) => {
                 data = { email: email };
-                User.findOne(req.users, data)
+                User.findOne(req.User, data)
                     .then((data) => {
                         if (!data) {
-                            User.create(req.users, email, userName, fullName, mobileNumber, profilePicture, password, profession, website, age, bio)
+                            User.create(req.User, email, userName, fullName, mobileNumber, profilePicture, password, profession, website, age, bio)
                                 .then((data) => {
                                     res.json({ data })
                                 }, (err) => {
@@ -35,7 +37,7 @@ export class UserController extends BaseAPIController {
         UserProvider.checkBlank([password, email])
             .then((data) => {
                 data = { email: email, password: password }
-                User.findOne(req.users, data)
+                User.findOne(req.User, data)
                     .then((data) => {
                         if (data) {
                             res.json({ data })
