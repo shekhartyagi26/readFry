@@ -9,38 +9,40 @@ export class UserController extends BaseAPIController {
         UserProvider.checkBlank([userName, fullName, mobileNumber, profilePicture, password, profession, website, age, bio, email])
             .then((data) => {
                 data = { email: email };
-                console.log(data,'+++++++++')
                 User.findOne(req.users, data)
                     .then((data) => {
-                        console.log(data)
-                        // if (!data) {
-                        //     User.create(req.users, userName, fullName, mobileNumber, profilePicture, password, profession, website, age, bio)
-                        //         .then((data) => {
-                        //             res.json({ data })
-                        //         }, (err) => {
-                        //             throw new Error(res.json(400, { message: err }));
-                        //         })
-                        // } else {
-                        //     throw new Error(res.json(400, { message: 'email id already exist' }));
-                        // }
+                        if (!data) {
+                            User.create(req.users, email, userName, fullName, mobileNumber, profilePicture, password, profession, website, age, bio)
+                                .then((data) => {
+                                    res.json({ data })
+                                }, (err) => {
+                                    throw new Error(res.json(400, { message: err }));
+                                })
+                        } else {
+                            throw new Error(res.json(400, { message: 'email id already exist' }));
+                        }
                     }).catch((err) => {
-                        console.log(err)
-                        // throw new Error(res.json(400, { message: err }));
+                        throw new Error(res.json(400, { message: err }));
                     })
             }).catch((err) => {
-                console.log(err,'=========')
-                // throw new Error(res.json(400, { message: err }))
+                throw new Error(res.json(400, { message: err }))
             })
     }
 
     /* Controller for User Login  */
     login = (req, res) => {
+        let { password, email } = req.body
         UserProvider.checkBlank([password, email])
             .then((data) => {
-                data = { email: req.email, password: req.password }
+                data = { email: email, password: password }
                 User.findOne(req.users, data)
                     .then((data) => {
-                        res.json({ data })
+                        if (data) {
+                            res.json({ data })
+                        } else {
+                            throw new Error(res.json(400, { message: 'Invalid Login Credentials' }));
+                        }
+
                     }).catch((err) => {
                         throw new Error(res.json(400, { message: err }));
                     })

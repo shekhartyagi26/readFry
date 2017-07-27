@@ -30,19 +30,19 @@
             var mobileNumber = $("#mobileNumber").val();
             var departmentName = $("#departmentName").val();
             $.ajax({
-                url: "http://localhost:8080/user/create",
+                url: "http://18.220.66.102:3001/user/create",
                 type: 'post',
                 data: {
                     userName: 'shekhar',
                     fullName: 'shekhar Tyagi',
                     mobileNumber: '8126',
                     profilePicture: '12331',
-                    password: '23123',
+                    password: 'profession',
                     profession: 'profession',
                     website: 'website',
                     age: 'age',
                     bio: 'bio',
-                    email: 'email',
+                    email: 'shekhartyagi26@gmail.com',
                 },
                 success: function(data) {
                     $("#successMessage").text(JSON.stringify(data));
