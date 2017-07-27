@@ -10,5 +10,8 @@ export default (app) => {
     /* Route for create Account */
     app.route("/user/create_account").post(user.create_account);
 
+    /* Route for forgot Password */
+    app.route("/user/forgot_password").post(user.forgot_password);
+    
     return app;
 };

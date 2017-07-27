@@ -43,7 +43,7 @@ const findOne = (db, data) => {
 const save = (db, data) => {
     let record = new db(data);
     return new Promise((resolve, reject) => {
-        record.save(function(err, result) {
+        record.save((err, result) => {
             if (err) {
                 reject(err);
             } else {
@@ -52,8 +52,20 @@ const save = (db, data) => {
         })
     })
 };
+const update = (db, checkData, updateData) => {
+    return new Promise((resolve, reject) => {
+        db.update(checkData, { $set: updateData }, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        })
+    })
+};
 export default {
     create,
     findOne,
     save,
+    update,
 };

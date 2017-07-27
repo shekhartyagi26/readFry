@@ -3,8 +3,11 @@ import UserProvider from "../providers/UserProvider.js";
 import User from "../models/User.js";
 import generatePassword from 'password-generator';
 import crypto from 'crypto';
-// import generic from "../modules/generic";
-import { getSuccess, notFoundError, serverError } from "../modules/generic";
+import config from "../../config.json";
+import { getSuccess, notFoundError, serverError, getSuccessMessage } from "../modules/generic";
+import twilio from "../modules/twilio";
+import mail from "../modules/mail";
+import constant from "../models/constant";
 
 export class UserController extends BaseAPIController {
 
@@ -124,6 +127,7 @@ export class UserController extends BaseAPIController {
             res.json({ status: 1, message: 'InComplete Details' });
         }
     }
+
     create_account = (req, res) => {
         let { mobileNumber, email, password } = req.body
         let data = {};
@@ -157,6 +161,59 @@ export class UserController extends BaseAPIController {
                             res.status(500);
                             res.json(serverError(e))
                         })
+                }
+            }).catch((e) => {
+                res.status(500);
+                res.json(serverError(e))
+            })
+    }
+
+    forgot_password = (req, res) => {
+        let { email, mobileNumber } = req.body;
+        let data = {};
+        let UserModel = req.User;
+        if (mobileNumber) {
+            data = { mobileNumber: mobileNumber }
+        } else if (email) {
+            data = { email: email }
+        } else if (!mobileNumber && !email) {
+            res.json({ status: 1, message: 'Invalid Request' });
+            return;
+        }
+        User.findOne(UserModel, data)
+            .then((user) => {
+                if (user) {
+                    let verification_code = Math.ceil(Math.random() * 10000);
+                    if (mobileNumber) {
+                        twilio.sendMessageTwilio(`your Mypoty verification code is: ${verification_code}`, '+918126724591')
+                            .then((result) => {
+                                let updatedData = { verification_code: verification_code }
+                                User.update(UserModel, data, updatedData)
+                                    .then(() => {
+                                        res.status(200);
+                                        res.json(getSuccessMessage())
+                                    }).catch((e) => {
+                                        res.status(500);
+                                        res.json(serverError(e))
+                                    })
+                            }).catch((e) => {
+                                res.status(500);
+                                res.json(serverError(e))
+                            })
+                    } else {
+                        mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
+                            .then((response) => {
+                                res.status(200);
+                                res.json(getSuccessMessage())
+                            })
+                            .catch((e) => {
+                                res.status(500);
+                                res.json(serverError(e))
+                            });
+                    }
+                } else {
+                    res.status(404);
+                    res.json(notFoundError('Details Not Found!'))
                 }
             }).catch((e) => {
                 res.status(500);

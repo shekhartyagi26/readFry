@@ -13,6 +13,10 @@ const getSuccess = (results) => {
     return generateResponse({ status: 200, data: results })
 };
 
+const getSuccessMessage = (message = {}) => {
+    return generateResponse({ status: 200, message: message })
+};
+
 const notFoundError = (e) => {
     return generateResponse({ status: 404, message: e })
 };
@@ -24,5 +28,6 @@ const serverError = (e) => {
 module.exports = {
     getSuccess,
     notFoundError,
-    serverError
+    serverError,
+    getSuccessMessage
 };
