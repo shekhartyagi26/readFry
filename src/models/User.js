@@ -40,7 +40,20 @@ const findOne = (db, data) => {
     })
 };
 
+const save = (db, data) => {
+    let record = new db(data);
+    return new Promise((resolve, reject) => {
+        record.save(function(err, result) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result)
+            }
+        })
+    })
+};
 export default {
     create,
     findOne,
+    save,
 };

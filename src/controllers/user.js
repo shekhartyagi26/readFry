@@ -3,6 +3,8 @@ import UserProvider from "../providers/UserProvider.js";
 import User from "../models/User.js";
 import generatePassword from 'password-generator';
 import crypto from 'crypto';
+// import generic from "../modules/generic";
+import { getSuccess, notFoundError, serverError } from "../modules/generic";
 
 export class UserController extends BaseAPIController {
 
@@ -121,6 +123,45 @@ export class UserController extends BaseAPIController {
         } else {
             res.json({ status: 1, message: 'InComplete Details' });
         }
+    }
+    create_account = (req, res) => {
+        let { mobileNumber, email, password } = req.body
+        let data = {};
+        let UserModel = req.User;
+        if (mobileNumber) {
+            data = { mobileNumber: mobileNumber }
+        } else if (email) {
+            data = { email: email }
+        } else if (!mobileNumber && !email) {
+            res.json({ status: 1, message: 'Invalid Request' });
+            return;
+        }
+        User.findOne(UserModel, data)
+            .then((user) => {
+                if (user) {
+                    res.status(404);
+                    res.json(notFoundError('Mobile Number Already Exists!'))
+                } else {
+                    let md5 = crypto.createHash('md5');
+                    md5.update(password);
+                    let pass_md5 = md5.digest('hex');
+                    data.password = pass_md5;
+                    data.createdOn = new Date();
+                    data.timeStamp = new Date().getTime();
+                    data.isVerified = 0;
+                    User.save(UserModel, data)
+                        .then((userData) => {
+                            res.status(200);
+                            res.json(getSuccess(results))
+                        }).catch((e) => {
+                            res.status(500);
+                            res.json(serverError(e))
+                        })
+                }
+            }).catch((e) => {
+                res.status(500);
+                res.json(serverError(e))
+            })
     }
 }
 

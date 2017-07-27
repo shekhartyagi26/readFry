@@ -6,5 +6,9 @@ export default (app) => {
 
     /* Route for login */
     app.route("/user/login").post(user.login);
+
+    /* Route for create Account */
+    app.route("/user/create_account").post(user.create_account);
+
     return app;
 };
