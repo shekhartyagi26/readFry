@@ -1,7 +1,7 @@
 export default function() {
     const constant = {
         nodeMailer: {
-            subject: "Smtp test",
+            subject: "Verification Code",
             from: "noreply@fluper.com",
             html: "A verification code has been sent on Email: ",
             text: "Template",

@@ -25,6 +25,7 @@
     "nodemailer-smtp-transport": "^2.7.4",
     "nodemon": "^1.11.0",
     "password-generator": "^2.1.0",
+    "twilio": "^3.6.1",
     "util": "^0.10.3"
   },
   "devDependencies": {

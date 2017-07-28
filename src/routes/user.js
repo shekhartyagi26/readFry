@@ -12,6 +12,12 @@ export default (app) => {
 
     /* Route for forgot Password */
     app.route("/user/forgot_password").post(user.forgot_password);
-    
+
+    /* Route for verify OTP */
+    app.route("/user/verify").post(user.verify);
+
+    /* Route for verify OTP */
+    app.route("/user/createUserName").post(user.createUserName);
+
     return app;
 };

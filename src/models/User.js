@@ -54,11 +54,11 @@ const save = (db, data) => {
 };
 const update = (db, checkData, updateData) => {
     return new Promise((resolve, reject) => {
-        db.update(checkData, { $set: updateData }, (err, result) => {
+        db.findOneAndUpdate(checkData, { $set: updateData }, (err, result) => {
             if (err) {
                 reject(err);
             } else {
-                resolve();
+                resolve(result);
             }
         })
     })

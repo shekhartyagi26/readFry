@@ -30,24 +30,25 @@
             var mobileNumber = $("#mobileNumber").val();
             var departmentName = $("#departmentName").val();
             $.ajax({
-                url: "http://localhost:3001/user/forgot_password",
+                url: "http://localhost:3001/user/verify",
                 type: 'post',
                 data: {
                     // user: {
-                    userName: 'shekhar',
-                    name: 'shekhar Tyagi',
-                    // mobileNumber: '812',
-                    profilePicture: '12331',
-                    password: 'profession',
-                    profession: 'profession',
-                    website: 'website',
-                    age: 'age',
-                    bio: 'bio',
-                    email: 'shekhartyagi26@gmail.com',
-                    fb_id: '1',
-                    type: 'facebook',
+                    // userName: 'shekhar',
+                    // name: 'shekhar Tyagi',
+                    mobileNumber: '8126724591',
+                    // profilePicture: '12331',
+                    // password: 'profession',
+                    verificationCode: 2158,
+                    // profession: 'profession',
+                    // website: 'website',
+                    // age: 'age',
+                    // bio: 'bio',
+                    // email: 'shekhartyagi26@gmail.com',
+                    // fb_id: '1',
+                    // type: 'facebook',
                     // },
-                    screen: 3
+                    // screen: 3
                 },
                 success: function(data) {
                     $("#successMessage").text(JSON.stringify(data));
