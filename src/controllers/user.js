@@ -8,136 +8,60 @@ import { getSuccess, notFoundError, serverError, getSuccessMessage, validateEmai
 import twilio from "../modules/twilio";
 import mail from "../modules/mail";
 import constant from "../models/constant";
+import jwt from "jsonwebtoken";
 
 export class UserController extends BaseAPIController {
 
     /* Controller for User Login  */
     login = (req, res) => {
-        let { password, email } = req.body
-        UserProvider.checkBlank([password, email])
-            .then((data) => {
-                data = { email: email, password: password }
-                User.findOne(req.User, data)
-                    .then((data) => {
-                        if (data) {
-                            res.json({ data })
-                        } else {
-                            throw new Error(res.json(400, { message: 'Invalid Login Credentials' }));
-                        }
-
-                    }).catch((err) => {
-                        throw new Error(res.json(400, { message: err }));
-                    })
-            }).catch((err) => {
-                throw new Error(res.json(400, { message: err }))
-            })
-    }
-
-    /* Controller for User Register  */
-    create = (req, res) => {
-        let body = req.body;
-        let user = body.user;
-        let screen = req.body.screen;
+        let { email, mobile, password } = req.body;
+        let data = {};
         let UserModel = req.User;
-        if (!user) {
-            res.json({ status: 1, message: 'Invalid Request' });
+        if (mobile && password) {
+            data = { mobile: mobile }
+        } else if (email && password) {
+            data = { email: email }
+        } else {
+            res.status(500)
+            res.json({ status: 500, flag: 1, response: {}, message: 'Data Missing' });
             return;
         }
-        if (screen == 1 && user.mobileNumber) {
-            UserModel.findOne({
-                mobileNumber: user.mobileNumber
-            }).exec(function(err, user) {
-                if (err) {
-                    res.json({ status: 1, message: err });
-                    return;
+        let md5 = crypto.createHash('md5');
+        md5.update(password);
+        data.password = md5.digest('hex');
+
+        User.findOne(UserModel, data)
+            .then((user) => {
+                if (user) {
+                    let token = jwt.sign({ token: user._id }, "secret_key", { expiresIn: 60 * 60 });
+                    res.status(200);
+                    res.json({ status: 200, flag: 1, response: { access_token: token }, message: 'Login Successfull' });
                 } else {
-                    if (user) {
-                        res.json({ status: 1, message: 'Mobile Number Already Exists!' });
-                        return;
-                    } else {
-                        res.json({ status: 0, message: 'Success' });
-                        return;
-                    }
+                    res.status(400);
+                    res.json({ status: 400, flag: 1, response: {}, message: 'USER_NOT_FOUND' });
                 }
+            }).catch((e) => {
+                res.status(500);
+                res.json(serverError(e))
             })
-        } else if (screen == 2 && user.userName) {
-            UserModel.findOne({
-                mobileNumber: user.userName
-            }).exec(function(err, user) {
-                if (err) {
-                    res.json({ status: 1, message: err });
-                    return;
-                } else {
-                    if (user) {
-                        res.json({ status: 1, message: 'User Name Already Exists!' });
-                        return;
-                    } else {
-                        res.json({ status: 0, message: 'Success' });
-                        return;
-                    }
-                }
-            })
-        } else if (user.fb_id && user.type == 'facebook' || user.google_id && user.type == 'google' || screen == 3) {
-            let email = user.email;
-            let password = '';
-            let name = user.name;
-            if (name && name.length > 0 && email && email.length > 0) {
-                if (user.fb_id || user.google_id) {
-                    password = generatePassword(6);
-                } else {
-                    if (user.password) {
-                        password = user.password;
-                    } else {
-                        res.json({ status: 1, message: 'Please provide password' });
-                        return;
-                    }
-                }
-                user.password = password;
-                let userObj = user;
-                UserModel.findOne({
-                    email: email
-                }).exec(function(err, user) {
-                    if (err) {
-                        next(err);
-                    } else {
-                        if (user) {
-                            res.json({ status: 1, message: 'Account Already Exists!' });
-                        } else {
-                            let md5 = crypto.createHash('md5');
-                            md5.update(password);
-                            let pass_md5 = md5.digest('hex');
-                            userObj.password = pass_md5;
-                            let model = new UserModel(userObj);
-                            model.save(function(err) {
-                                if (err) {
-                                    next(err);
-                                } else {
-                                    let id = model._id;
-                                    userObj.id = id;
-                                    res.json({ status: 0, data: userObj });
-                                }
-                            });
-                        }
-                    }
-                });
-            } else {
-                res.json({ status: 1, message: 'InComplete Details' });
-            }
-        } else {
-            res.json({ status: 1, message: 'InComplete Details' });
-        }
     }
 
     create_account = (req, res) => {
-        let { mobileNumber, email, password } = req.body
-        let data = {};
+        var body = req.body;
+        var user_details = body.user;
         let UserModel = req.User;
-        if (mobileNumber && password) {
-            data = { mobileNumber: mobileNumber }
+        if (!user_details) {
+            res.json({ status: 200, flag: 1, response: {}, message: 'User Details not Found' });
+            return;
+        }
+        let data = {};
+        let { mobile, email, password } = body.user;
+        if (mobile && password) {
+            data = { mobile: mobile }
         } else if (email && password) {
             data = { email: email }
-        } else if (!mobileNumber && !password || !email && !password) {
-            res.json({ status: 1, message: 'Invalid Request' });
+        } else if (!mobile && !password || !email && !password) {
+            res.json({ status: 200, flag: 1, response: {}, message: 'Data Missing' });
             return;
         }
 
@@ -145,26 +69,26 @@ export class UserController extends BaseAPIController {
             .then((user) => {
                 if (user) {
                     res.status(404);
-                    res.json(notFoundError('data Already Exists!'))
+                    res.json({ Status: 200, Flag: 1, Response: {}, Message: 'USER_ALREADY_EXISTS' });
                 } else {
                     let md5 = crypto.createHash('md5');
                     md5.update(password);
                     let pass_md5 = md5.digest('hex');
-                    data.password = pass_md5;
-                    data.createdOn = new Date();
-                    data.timeStamp = new Date().getTime();
-                    data.isVerified = 0;
-                    User.save(UserModel, data)
+                    user_details.password = pass_md5
+                    user_details.createdOn = new Date();
+                    user_details.timeStamp = new Date().getTime();
+                    user_details.isVerified = 0;
+                    User.save(UserModel, user_details)
                         .then((userData) => {
-                            let verificationCode = Math.ceil(Math.random() * 10000);
-                            if (mobileNumber) {
+                            let verification_code = Math.ceil(Math.random() * 10000);
+                            if (mobile) {
                                 twilio.sendMessageTwilio(`your Mypoty verification code is: ${verification_code}`, '+918126724591')
                                     .then((result) => {
                                         let updatedData = { verification_code: verification_code }
                                         User.update(UserModel, data, updatedData)
-                                            .then(() => {
+                                            .then((data) => {
                                                 res.status(200);
-                                                res.json({ status: 200, message: "OTP has been sent successfully , Please Verify", data: {} });
+                                                res.json({ status: 200, flag: 1, response: userData, message: 'OTP has been sent successfully , Please Verify' });
                                             }).catch((e) => {
                                                 res.status(500);
                                                 res.json(serverError(e))
@@ -179,7 +103,7 @@ export class UserController extends BaseAPIController {
                                         User.update(UserModel, data, updatedData)
                                             .then(() => {
                                                 res.status(200);
-                                                res.json({ status: 200, message: "email has been sent successfully , Please Verify", data: {} });
+                                                res.json({ status: 200, flag: 1, response: userData, message: 'email has been sent successfully , Please Verify' });
                                             }).catch((e) => {
                                                 res.status(500);
                                                 res.json(serverError(e))
@@ -199,6 +123,48 @@ export class UserController extends BaseAPIController {
                 res.status(500);
                 res.json(serverError(e))
             })
+    }
+
+    social = (req, res) => {
+        var body = req.body;
+        var user = body.user;
+        if (!user) {
+            res.json({ error: 1, message: 'Invalid Request' });
+            return;
+        }
+        var email = user.email;
+        var password = '';
+        var name = user.name;
+
+        if (user.fb_id && name && name.length > 0 && email && email.length > 0) {
+            user.type = 'facebook';
+            password = generatePassword(6);
+            user.password = password;
+            var UserModel = req.User;
+            var userObj = user;
+            User.findOne(UserModel, { email: email })
+                .then((user_details) => {
+                    if (user_details) {
+                        res.status(200);
+                        res.json({ status: 200, flag: 1, response: user_details, message: 'USER_ALREADY_EXISTS' });
+                    } else {
+                        User.save(UserModel, user)
+                            .then((userData) => {
+                                res.status(200);
+                                res.json({ Status: 200, Flag: 1, Response: userData, Message: 'USER_SAVED_SUCCESSFULLY' });
+                            }).catch((e) => {
+                                res.status(500);
+                                res.json(serverError(e))
+                            })
+                    }
+                }).catch((e) => {
+                    res.status(500);
+                    res.json(serverError(e))
+                })
+        } else {
+            res.status(500)
+            res.json({ error: 1, message: 'InComplete Details' });
+        }
     }
 
     forgot_password = (req, res) => {
