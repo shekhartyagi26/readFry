@@ -16,7 +16,7 @@ export default (app) => {
     /* Route for verify OTP */
     app.route("/user/verify").post(user.verify);
 
-    /* Route for verify OTP */
+    /* Route for create UserName */
     app.route("/user/createUserName").post(user.createUserName);
 
     return app;
