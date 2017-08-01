@@ -30,28 +30,40 @@
             var mobileNumber = $("#mobileNumber").val();
             var departmentName = $("#departmentName").val();
             $.ajax({
-                url: "http://localhost:3001/user/socialLogin",
-                // url: "http://18.220.66.102:3001/user/verifyCode",
+                url: "http://localhost:3001/user/createUserName",
+                // url: "http://18.220.66.102:3001/user/createUserName",
                 type: 'post',
-                data: {
-                    user: {
-                        // userName: 'shekhar',
-                        // name: 'shekhar Tyagi',/
+                data:
+                // {
+                //     "user": {
+                //         "email": "harshtanwar41@yahoo.com",
+                //         "device_type": "android",
+                //         "device_token": "1234567890",
+                //         "fb_id": "1485036438222368"
+                //     }
+                // },
+                {
 
-                        // mobile: '81267245912',
-                        // profilePicture: '12331',
-                        // password: 'profession',
-                        // password: '121345',
-                        // profession: 'profession',
-                        // website: 'website',
-                        // age: 'age',
-                        // bio: 'bio',
-                        // verification_code: '992',
-                        // mobile: "8126724591",
-                        // email: 'shekhartyagi26@gmail.com',
-                        fb_id: '2',
-                        // type: 'facebook',
-                    },
+                    // user: {
+                    // userName: 'shekhar',
+                    // name: 'shekhar Tyagi',/
+
+                    // mobile: '81267245912',
+                    // profilePicture: '12331',
+                    // password: 'profession',
+                    // password: '121345',
+                    // profession: 'profession',
+                    // website: 'website',
+                    // age: 'age',
+                    // bio: 'bio',
+                    // verification_code: '992',
+                    // mobile: "8126724591",
+                    // email: 'shekhartyagi26@gmail.com',
+                    fb_id: '567',
+                    access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI1OTgwNWFjNzZhNzY4ZjdmZGE4OWZkZTUiLCJ0aW1lU3RhbXAiOiIyMDE3LTA4LTAxVDEwOjQxOjExLjQ1N1oifQ.5gmy2Sink-O0SD7bXmQwTMeppJSC0kvjEnuT_iH1MS",
+                    user_name: 'shekhar',
+                    // type: 'facebook',
+                    // },
                     // screen: 3
                 },
                 success: function(data) {

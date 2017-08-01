@@ -9,7 +9,8 @@ import twilio from "../modules/twilio";
 import mail from "../modules/mail";
 import constant from "../models/constant";
 import jwt from "jwt-simple";
-import { encodeToken, decodeToken } from "../modules/token";
+import { encodeToken } from "../modules/token";
+import token from "../modules/token";
 
 export class UserController extends BaseAPIController {
 
@@ -341,42 +342,65 @@ export class UserController extends BaseAPIController {
     //             res.json(successResponse(500, e, 'Error'));
     //         })
     // }
-    // createUserName = (req, res) => {
-    //     let { mobileNumber, email, userName } = req.body;
-    //     let data = {};
-    //     let updatedData = {};
-    //     let UserModel = req.User;
+    createUserName = (req, res) => {
+        let { access_token, user_name } = req.body;
+        let data = {};
+        let updatedData = {};
+        let UserModel = req.User;
+        console.log(access_token, user_name)
+        if (access_token && user_name) {
 
-    //     if (mobileNumber && userName) {
-    //         updatedData = { userName: userName }
-    //         data = { mobileNumber: mobileNumber }
-    //     } else if (email && userName) {
-    //         updatedData = { userName: userName }
-    //         data = { email: email }
-    //     } else {
-    //         res.json({ status: 1, message: 'Invalid Request' });
-    //         return;
-    //     }
-    //     User.findOne(UserModel, updatedData)
-    //         .then((user) => {
-    //             if (user) {
-    //                 res.status(404);
-    //                 res.json(notFoundError('User Name Already Exists!'))
-    //             } else {
-    //                 User.update(UserModel, data, updatedData)
-    //                     .then(() => {
-    //                         res.status(200);
-    //                         res.json({ status: 200, message: 'userName updated', data: {} });
-    //                     }).catch((e) => {
-    //                         res.status(500);
-    //                         res.json(serverError(e))
-    //                     })
-    //             }
-    //         }).catch((e) => {
-    //             res.status(500);
-    //             res.json(serverError(e))
-    //         })
-    // }
+            token.decodeToken(access_token)
+                .then((data) => {
+                    console.log(data, '-------')
+                }).catch((e) => {
+                    console.log(e, '++++++++++')
+                })
+            // console.log(id)
+            // User.findOne(UserModel, { _id: id })
+            //     .then((user) => {
+            //         console.log('++++++++++++')
+            //         console.log(user)
+            //         console.log('++++++++++++')
+            //     }).catch((e) => {
+            //         console.log('---------')
+            //         console.log(e)
+            //     })
+        } else {
+            res.status(400)
+            res.json(successResponse(400, {}, 'INVALID_DETAILS'));
+        }
+
+        // if (mobileNumber && userName) {
+        //     updatedData = { userName: userName }
+        //     data = { mobileNumber: mobileNumber }
+        // } else if (email && userName) {
+        //     updatedData = { userName: userName }
+        //     data = { email: email }
+        // } else {
+        //     res.json({ status: 1, message: 'Invalid Request' });
+        //     return;
+        // }
+        // User.findOne(UserModel, updatedData)
+        //     .then((user) => {
+        //         if (user) {
+        //             res.status(404);
+        //             res.json(notFoundError('User Name Already Exists!'))
+        //         } else {
+        //             User.update(UserModel, data, updatedData)
+        //                 .then(() => {
+        //                     res.status(200);
+        //                     res.json({ status: 200, message: 'userName updated', data: {} });
+        //                 }).catch((e) => {
+        //                     res.status(500);
+        //                     res.json(serverError(e))
+        //                 })
+        //         }
+        //     }).catch((e) => {
+        //         res.status(500);
+        //         res.json(serverError(e))
+        //     })
+    }
 }
 
 const controller = new UserController();

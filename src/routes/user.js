@@ -22,8 +22,8 @@ export default (app) => {
     // /* Route for Resend OTP */
     // app.route("/user/resendOTP").post(user.resendOTP);
 
-    // /* Route for create UserName */
-    // app.route("/user/createUserName").post(user.createUserName);
+    /* Route for create UserName */
+    app.route("/user/createUserName").post(user.createUserName);
 
     return app;
 };

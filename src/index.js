@@ -22,6 +22,7 @@ app.use(db());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(bodyParser.json());
 const initRoutes = (app) => {
     // including all routes
     glob("./routes/*.js", {

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 const generateResponse = ({ status, message = null, description = null, data = {} }) => {
     return {
         status: status.toString(),
@@ -37,6 +38,17 @@ const successResponse = (status = 200, response = '{}', message = "", flag = 1) 
         "message": message
     });
 }
+const checkBlank = (arr) => {
+    _.map(arr, (val, key) => {
+        if (val == '' || val === "" || val == undefined) {
+            return ('Some parameters missing');
+        } else {
+            if (key == (_.size(arr) - 1)) {
+                return (null, 'done');
+            }
+        }
+    })
+};
 
 module.exports = {
     getSuccess,
@@ -44,5 +56,6 @@ module.exports = {
     serverError,
     getSuccessMessage,
     validateEmail,
-    successResponse
+    successResponse,
+    checkBlank
 };

@@ -1,4 +1,5 @@
 import jwt from 'jwt-simple';
+import { successResponse } from "../modules/generic";
 
 
 const encodeToken = (id) => {
@@ -7,11 +8,19 @@ const encodeToken = (id) => {
     return jwt.encode(payload, secret);
 }
 const decodeToken = (token) => {
-    let secret = 'xxx';
-    return jwt.decode(token, secret);
-}
+    return new Promise((resolve, reject) => {
+        try {
+            resolve(jwt.decode(token, secret));
+        } catch (err) {
+            reject(err);
+        }
+    })
+};
+
+export default {
+    decodeToken
+};
 
 module.exports = {
-    encodeToken,
-    decodeToken
+    encodeToken
 };
