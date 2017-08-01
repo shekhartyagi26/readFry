@@ -10,8 +10,8 @@ export default (app) => {
     /* Route for create Account */
     app.route("/user/signUp").post(user.signUp);
 
-    // /* Route for Social login and create */
-    // app.route("/user/socialLogin").post(user.socialLogin);
+    /* Route for Social login and create */
+    app.route("/user/socialLogin").post(user.socialLogin);
 
     // /* Route for forgot Password */
     // app.route("/user/forgot_password").post(user.forgot_password);

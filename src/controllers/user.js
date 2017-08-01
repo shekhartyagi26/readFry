@@ -98,11 +98,11 @@ export class UserController extends BaseAPIController {
                                                 res.json(successResponse(200, { access_token: updatedData.access_token, status: 1 }, 'AN_OTP_HAS_BEEN_SENT,PLEASE_VERIFY_OTP'));
                                             }).catch((e) => {
                                                 res.status(500);
-                                                res.json(successResponse(500, e, 'Error'));
+                                                res.json(successResponse(500, e, 'ERROR'));
                                             })
                                     }).catch((e) => {
                                         res.status(500);
-                                        res.json(successResponse(500, e, 'Error'));
+                                        res.json(successResponse(500, e, 'ERROR'));
                                     })
                             } else {
                                 mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
@@ -113,67 +113,79 @@ export class UserController extends BaseAPIController {
                                                 res.json(successResponse(200, { access_token: updatedData.access_token, status: 1 }, 'AN_EMAIL_HAS_BEEN_SENT, PLEASE_VERIFY_OTP'));
                                             }).catch((e) => {
                                                 res.status(500);
-                                                res.json(successResponse(500, e, 'Error'));
+                                                res.json(successResponse(500, e, 'ERROR'));
                                             })
                                     })
                                     .catch((e) => {
                                         res.status(500);
-                                        res.json(successResponse(500, e, 'Error'));
+                                        res.json(successResponse(500, e, 'ERROR'));
                                     });
                             }
                         }).catch((e) => {
                             res.status(500);
-                            res.json(successResponse(500, e, 'Error'));
+                            res.json(successResponse(500, e, 'ERROR'));
                         })
                 }
             }).catch((e) => {
                 res.status(500);
-                res.json(successResponse(500, e, 'Error'));
+                res.json(successResponse(500, e, 'ERROR'));
             })
     }
 
-    // socialLogin = (req, res) => {
-    //     var body = req.body;
-    //     var user = body.user;
-    //     if (!user) {
-    //         res.json({ error: 1, message: 'Invalid Request' });
-    //         return;
-    //     }
-    //     var email = user.email;
-    //     var password = '';
-    //     var name = user.name;
-
-    //     if (user.fb_id && name && name.length > 0 && email && email.length > 0) {
-    //         user.type = 'facebook';
-    //         password = generatePassword(6);
-    //         user.password = password;
-    //         user.is_verify = 0;
-    //         var UserModel = req.User;
-    //         var userObj = user;
-    //         User.findOne(UserModel, { email: email })
-    //             .then((user_details) => {
-    //                 if (user_details) {
-    //                     res.status(200);
-    //                     res.json({ status: 200, flag: 1, response: user_details, message: 'USER_ALREADY_EXISTS' });
-    //                 } else {
-    //                     User.save(UserModel, user)
-    //                         .then((userData) => {
-    //                             res.status(200);
-    //                             res.json({ Status: 200, Flag: 1, Response: userData, Message: 'USER_SAVED_SUCCESSFULLY' });
-    //                         }).catch((e) => {
-    //                             res.status(500);
-    //                             res.json(serverError(e))
-    //                         })
-    //                 }
-    //             }).catch((e) => {
-    //                 res.status(500);
-    //                 res.json(serverError(e))
-    //             })
-    //     } else {
-    //         res.status(500)
-    //         res.json({ error: 1, message: 'InComplete Details' });
-    //     }
-    // }
+    socialLogin = (req, res) => {
+        let body = req.body;
+        let user = body.user;
+        if (!user) {
+            res.json({ error: 1, message: 'INVALID_DETAILS' });
+            return;
+        }
+        let password = '';
+        let fb_id = user.fb_id;
+        if (fb_id) {
+            user.type = 'facebook';
+            password = generatePassword(6);
+            user.password = password;
+            user.created_on = new Date();
+            user.timeStamp = new Date().getTime();
+            user.is_verify = 0;
+            user.is_deleted = 0;
+            user.is_blocked = 0;
+            user.modified_on = new Date();
+            user.status = 3;
+            const UserModel = req.User;
+            var userObj = user;
+            User.findOne(UserModel, { fb_id: fb_id })
+                .then((user_details) => {
+                    if (user_details) {
+                        res.status(200)
+                        res.json(successResponse(200, user, 'USER_ALREADY_EXISTS'));
+                    } else {
+                        User.save(UserModel, user)
+                            .then((userData) => {
+                                let access_token = encodeToken(userData._id)
+                                userData.access_token = access_token
+                                User.update(UserModel, { fb_id: fb_id }, { access_token: access_token })
+                                    .then(() => {
+                                        res.status(200)
+                                        res.json(successResponse(200, userData, 'USER_CREATED_SUCESSFULLY'));
+                                    }).catch((e) => {
+                                        res.status(500);
+                                        res.json(successResponse(500, e, 'ERROR'));
+                                    })
+                            }).catch((e) => {
+                                res.status(500);
+                                res.json(successResponse(500, e, 'ERROR'));
+                            })
+                    }
+                }).catch((e) => {
+                    res.status(500);
+                    res.json(successResponse(500, e, 'ERROR'));
+                })
+        } else {
+            res.status(500);
+            res.json(successResponse(500, e, 'INVALID_DETAILS'));
+        }
+    }
 
     // forgot_password = (req, res) => {
     //     let { email, mobileNumber } = req.body;
