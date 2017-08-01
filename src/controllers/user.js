@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import generatePassword from 'password-generator';
 import crypto from 'crypto';
 import config from "../../config.json";
-import { getSuccess, notFoundError, serverError, getSuccessMessage, validateEmail } from "../modules/generic";
+import { getSuccess, notFoundError, serverError, getSuccessMessage, validateEmail, successResponse } from "../modules/generic";
 import twilio from "../modules/twilio";
 import mail from "../modules/mail";
 import constant from "../models/constant";
@@ -140,6 +140,7 @@ export class UserController extends BaseAPIController {
             user.type = 'facebook';
             password = generatePassword(6);
             user.password = password;
+            user.is_verify = 0;
             var UserModel = req.User;
             var userObj = user;
             User.findOne(UserModel, { email: email })
@@ -228,31 +229,38 @@ export class UserController extends BaseAPIController {
     }
 
     verify = (req, res) => {
-        let { mobileNumber, email, verificationCode } = req.body;
+        let { mobile, email, verification_code } = req.body;
+        const UserModel = req.User;
         let data = {};
-        if (mobileNumber && verificationCode) {
-            data = { mobileNumber: mobileNumber, verificationCode: verificationCode }
-        } else if (email && verificationCode) {
-            data = { email: email, verificationCode: verificationCode }
+        if (mobile && verification_code) {
+            data = { mobile: mobile, verification_code: Number(verification_code) }
+        } else if (email && verification_code) {
+            data = { email: email, verification_code: Number(verification_code) }
         } else {
-            res.json({ status: 1, message: 'Invalid Request' });
+            res.status(400)
+            res.json(successResponse(400, {}, 'INVALID_DETAILS'));
             return;
         }
-        req.User.findOne(data, function(err, doc) {
-            if (err) {
-                res.status(500);
-                res.json(serverError(err));
-            } else {
-                if (doc) {
-                    res.status(200);
-                    var response = { status: 200, message: 'verification Code matched', data: doc };
-                    res.send(JSON.stringify(response));
-                } else {
+        User.findOne(UserModel, data)
+            .then((user) => {
+                if (!user) {
                     res.status(404);
-                    res.json(notFoundError('Details Not Found!'))
+                    res.json(successResponse(400, '{}', 'USER_NOT_FOUND'));
+                } else {
+                    let updatedData = { is_verify: 1 };
+                    User.update(UserModel, data, updatedData)
+                        .then(() => {
+                            res.status(200);
+                            res.json(successResponse(200, user, 'OTP_MATCHED_SUCCESSFULLY'));
+                        }).catch((e) => {
+                            res.status(500);
+                            res.json(successResponse(500, e, 'Error'));
+                        })
                 }
-            }
-        });
+            }).catch((e) => {
+                res.status(500);
+                res.json(successResponse(500, e, 'Error'));
+            })
     }
 
     createUserName = (req, res) => {
