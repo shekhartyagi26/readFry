@@ -7,20 +7,16 @@ const encodeToken = (id) => {
     let payload = { _id: id, timeStamp: new Date() };
     return jwt.encode(payload, secret);
 }
-const decodeToken = (token) => {
-    return new Promise((resolve, reject) => {
-        try {
-            resolve(jwt.decode(token, secret));
-        } catch (err) {
-            reject(err);
-        }
-    })
-};
 
-export default {
-    decodeToken
-};
+// const decodeToken = (token) => {
+//     try {
+//         return (jwt.decode(token, secret));
+//     } catch (err) {
+//         return (err);
+//     }
+// };
 
 module.exports = {
     encodeToken
+    // decodeToken
 };

@@ -15,38 +15,52 @@ import token from "../modules/token";
 export class UserController extends BaseAPIController {
 
     /* Controller for User Login  */
-    // login = (req, res) => {
-    //     let { email, mobile, password } = req.body;
-    //     let data = {};
-    //     let UserModel = req.User;
-    //     if (mobile && password) {
-    //         data = { mobile: mobile }
-    //     } else if (email && password) {
-    //         data = { email: email }
-    //     } else {
-    //         res.status(500)
-    //         res.json({ status: 500, flag: 1, response: {}, message: 'Data Missing' });
-    //         return;
-    //     }
-    //     let md5 = crypto.createHash('md5');
-    //     md5.update(password);
-    //     data.password = md5.digest('hex');
-
-    //     User.findOne(UserModel, data)
-    //         .then((user) => {
-    //             if (user) {
-    //                 let token = jwt.sign({ token: user._id }, "secret_key", { expiresIn: 60 * 60 });
-    //                 res.status(200);
-    //                 res.json({ status: 200, flag: 1, response: { access_token: token }, message: 'Login Successfull' });
-    //             } else {
-    //                 res.status(400);
-    //                 res.json({ status: 400, flag: 1, response: {}, message: 'USER_NOT_FOUND' });
-    //             }
-    //         }).catch((e) => {
-    //             res.status(500);
-    //             res.json(serverError(e))
-    //         })
-    // }
+    login = (req, res) => {
+        let { email, mobile, password } = req.body;
+        let data = {};
+        let UserModel = req.User;
+        if (mobile && password) {
+            data = { mobile: mobile }
+        } else if (email && password) {
+            data = { email: email }
+        } else {
+            res.status(400)
+            res.json(successResponse(400, {}, 'PARAMETER_MISSING'));
+            return;
+        }
+        var md5 = crypto.createHash('md5');
+        md5.update(password);
+        var pass_md5 = md5.digest('hex');
+        data.password = pass_md5
+        User.findOne(UserModel, data)
+            .then((user) => {
+                if (user) {
+                    let access_token = encodeToken(user._id)
+                    UserModel.findOneAndUpdate(data, { $set: { "access_token": access_token }, returnNewDocument: true, upsert: true }, (err, insertData) => {
+                        if (err) {
+                            res.status(500);
+                            res.json(successResponse(500, err, 'ERROR'));
+                        } else {
+                            if (insertData) {
+                                insertData.access_token = access_token;
+                                delete insertData.get('password')
+                                res.status(200);
+                                res.json(successResponse(200, insertData, 'LOGIN_SUCCESS'));
+                            } else {
+                                res.status(400);
+                                res.json(successResponse(400, {}, 'INVALID_ACCESS_TOKEN'));
+                            }
+                        }
+                    });
+                } else {
+                    res.status(400);
+                    res.json(successResponse(400, {}, 'USER_NOT_FOUND'));
+                }
+            }).catch((e) => {
+                res.status(500);
+                res.json(successResponse(500, e, 'ERROR'));
+            })
+    }
 
     signUp = (req, res) => {
         var body = req.body;
@@ -96,7 +110,7 @@ export class UserController extends BaseAPIController {
                                         User.update(UserModel, data, updatedData)
                                             .then((data) => {
                                                 res.status(200)
-                                                res.json(successResponse(200, { access_token: updatedData.access_token, status: 1 }, 'AN_OTP_HAS_BEEN_SENT,PLEASE_VERIFY_OTP'));
+                                                res.json(successResponse(200, { access_token: updatedData.access_token, status: 1, mobile: mobile }, 'AN_OTP_HAS_BEEN_SENT,PLEASE_VERIFY_OTP'));
                                             }).catch((e) => {
                                                 res.status(500);
                                                 res.json(successResponse(500, e, 'ERROR'));
@@ -111,7 +125,7 @@ export class UserController extends BaseAPIController {
                                         User.update(UserModel, data, updatedData)
                                             .then(() => {
                                                 res.status(200)
-                                                res.json(successResponse(200, { access_token: updatedData.access_token, status: 1 }, 'AN_EMAIL_HAS_BEEN_SENT, PLEASE_VERIFY_OTP'));
+                                                res.json(successResponse(200, { access_token: updatedData.access_token, status: 1, email: email }, 'AN_EMAIL_HAS_BEEN_SENT, PLEASE_VERIFY_OTP'));
                                             }).catch((e) => {
                                                 res.status(500);
                                                 res.json(successResponse(500, e, 'ERROR'));
@@ -136,6 +150,8 @@ export class UserController extends BaseAPIController {
     socialLogin = (req, res) => {
         let body = req.body;
         let user = body.user;
+        console.log(body);
+        res.send(body)
         if (!user) {
             res.json({ error: 1, message: 'INVALID_DETAILS' });
             return;
@@ -188,66 +204,6 @@ export class UserController extends BaseAPIController {
         }
     }
 
-    // forgot_password = (req, res) => {
-    //     let { email, mobileNumber } = req.body;
-    //     let data = {};
-    //     let UserModel = req.User;
-    //     if (mobileNumber) {
-    //         data = { mobileNumber: mobileNumber }
-    //     } else if (email) {
-    //         data = { email: email }
-    //     } else if (!mobileNumber && !email) {
-    //         res.json({ status: 1, message: 'Invalid Request' });
-    //         return;
-    //     }
-    //     User.findOne(UserModel, data)
-    //         .then((user) => {
-    //             if (user) {
-    //                 let verificationCode = Math.ceil(Math.random() * 10000);
-    //                 let updatedData = { verificationCode: verificationCode }
-
-    //                 if (mobileNumber) {
-    //                     twilio.sendMessageTwilio(`your Mypoty verification code is: ${verificationCode}`, '+918126724591')
-    //                         .then((result) => {
-    //                             User.update(UserModel, data, updatedData)
-    //                                 .then(() => {
-    //                                     res.status(200);
-    //                                     res.json(getSuccessMessage())
-    //                                 }).catch((e) => {
-    //                                     res.status(500);
-    //                                     res.json(serverError(e))
-    //                                 })
-    //                         }).catch((e) => {
-    //                             res.status(500);
-    //                             res.json(serverError(e))
-    //                         })
-    //                 } else {
-    //                     mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verificationCode)
-    //                         .then((response) => {
-    //                             User.update(UserModel, data, updatedData)
-    //                                 .then(() => {
-    //                                     res.status(200);
-    //                                     res.json(getSuccessMessage())
-    //                                 }).catch((e) => {
-    //                                     res.status(500);
-    //                                     res.json(serverError(e))
-    //                                 })
-    //                         })
-    //                         .catch((e) => {
-    //                             res.status(500);
-    //                             res.json(serverError(e))
-    //                         });
-    //                 }
-    //             } else {
-    //                 res.status(404);
-    //                 res.json(notFoundError('Details Not Found!'))
-    //             }
-    //         }).catch((e) => {
-    //             res.status(500);
-    //             res.json(serverError(e))
-    //         })
-    // }
-
     verifyCode = (req, res) => {
         let { mobile, email, verification_code } = req.body;
         const UserModel = req.User;
@@ -283,123 +239,101 @@ export class UserController extends BaseAPIController {
             })
     }
 
-    // resendOTP = (req, res) => {
-    //     let { mobile, email } = req.body;
-    //     const UserModel = req.User;
-    //     let data = {};
-    //     if (mobile) {
-    //         data = { mobile: mobile }
-    //     } else if (email) {
-    //         data = { email: email }
-    //     } else {
-    //         res.status(400)
-    //         res.json(successResponse(400, {}, 'INVALID_DETAILS'));
-    //         return;
-    //     }
-    //     User.findOne(UserModel, data)
-    //         .then((user) => {
-    //             if (!user) {
-    //                 res.status(404);
-    //                 res.json(successResponse(400, '{}', 'USER_NOT_FOUND'));
-    //             } else {
-    //                 let verificationCode = Math.ceil(Math.random() * 10000);
-    //                 let updatedData = { verificationCode: verificationCode }
-    //                 if (mobile) {
-    //                     twilio.sendMessageTwilio(`your Mypoty verification code is: ${verificationCode}`, '+918126724591')
-    //                         .then((result) => {
-    //                             User.update(UserModel, data, updatedData)
-    //                                 .then(() => {
-    //                                     res.status(200);
-    //                                     res.json(successResponse(200, '{}', 'PLEASE_VERIFY_OTP'));
-    //                                 }).catch((e) => {
-    //                                     res.status(500);
-    //                                     res.json(successResponse(500, e, 'Error'));
-    //                                 })
-    //                         }).catch((e) => {
-    //                             res.status(500);
-    //                             res.json(successResponse(500, e, 'Error'));
-    //                         })
-    //                 } else {
-    //                     mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verificationCode)
-    //                         .then((response) => {
-    //                             User.update(UserModel, data, updatedData)
-    //                                 .then(() => {
-    //                                     res.status(200);
-    //                                     res.json(successResponse(200, '{}', 'PLEASE_VERIFY_OTP'));
-    //                                 }).catch((e) => {
-    //                                     res.status(500);
-    //                                     res.json(successResponse(500, e, 'Error'));
-    //                                 })
-    //                         })
-    //                         .catch((e) => {
-    //                             res.status(500);
-    //                             res.json(successResponse(500, e, 'Error'));
-    //                         });
-    //                 }
-    //             }
-    //         }).catch((e) => {
-    //             res.status(500);
-    //             res.json(successResponse(500, e, 'Error'));
-    //         })
-    // }
+
+    forgot_password = (req, res) => {
+        let { mobile, email } = req.body;
+        const UserModel = req.User;
+        let data = {};
+        if (mobile) {
+            data = { mobile: mobile }
+        } else if (email) {
+            data = { email: email }
+        } else {
+            res.status(400)
+            res.json(successResponse(400, {}, 'INVALID_DETAILS'));
+            return;
+        }
+        User.findOne(UserModel, data)
+            .then((user) => {
+                if (!user) {
+                    res.status(404);
+                    res.json(successResponse(400, '{}', 'USER_NOT_FOUND'));
+                } else {
+                    let verificationCode = Math.ceil(Math.random() * 10000);
+                    let updatedData = { verificationCode: verificationCode }
+                    if (mobile) {
+                        twilio.sendMessageTwilio(`your Mypoty verification code is: ${verificationCode}`, '+918126724591')
+                            .then((result) => {
+                                User.update(UserModel, data, updatedData)
+                                    .then(() => {
+                                        res.status(200);
+                                        res.json(successResponse(200, '{}', 'PLEASE_VERIFY_OTP'));
+                                    }).catch((e) => {
+                                        res.status(500);
+                                        res.json(successResponse(500, e, 'Error'));
+                                    })
+                            }).catch((e) => {
+                                res.status(500);
+                                res.json(successResponse(500, e, 'Error'));
+                            })
+                    } else {
+                        mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verificationCode)
+                            .then((response) => {
+                                User.update(UserModel, data, updatedData)
+                                    .then(() => {
+                                        res.status(200);
+                                        res.json(successResponse(200, '{}', 'PLEASE_VERIFY_OTP'));
+                                    }).catch((e) => {
+                                        res.status(500);
+                                        res.json(successResponse(500, e, 'Error'));
+                                    })
+                            })
+                            .catch((e) => {
+                                res.status(500);
+                                res.json(successResponse(500, e, 'Error'));
+                            });
+                    }
+                }
+            }).catch((e) => {
+                res.status(500);
+                res.json(successResponse(500, e, 'Error'));
+            })
+    }
+
     createUserName = (req, res) => {
         let { access_token, user_name } = req.body;
-        let data = {};
-        let updatedData = {};
         let UserModel = req.User;
-        console.log(access_token, user_name)
         if (access_token && user_name) {
+            User.findOne(UserModel, { user_name: user_name })
+                .then((userDetails) => {
+                    if (userDetails) {
+                        res.status(400);
+                        res.json(successResponse(400, e, 'USERNAME_ALREADY_EXIST'));
+                    } else {
+                        UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { "user_name": user_name, "status": 3 }, returnNewDocument: true }, (err, insertData) => {
+                            if (err) {
+                                res.status(500);
+                                res.json(successResponse(500, err, 'ERROR'));
+                            } else {
+                                if (insertData) {
+                                    res.status(200);
+                                    res.json(successResponse(200, { access_token: access_token, status: 3 }, 'USERNAME_SAVED'));
+                                } else {
+                                    res.status(400);
+                                    res.json(successResponse(400, {}, 'INVALID_ACCESS_TOKEN'));
+                                }
+                            }
+                        });
 
-            token.decodeToken(access_token)
-                .then((data) => {
-                    console.log(data, '-------')
+                    }
                 }).catch((e) => {
-                    console.log(e, '++++++++++')
+                    res.status(500);
+                    res.json(successResponse(500, e, 'ERROR'));
                 })
-            // console.log(id)
-            // User.findOne(UserModel, { _id: id })
-            //     .then((user) => {
-            //         console.log('++++++++++++')
-            //         console.log(user)
-            //         console.log('++++++++++++')
-            //     }).catch((e) => {
-            //         console.log('---------')
-            //         console.log(e)
-            //     })
         } else {
             res.status(400)
             res.json(successResponse(400, {}, 'INVALID_DETAILS'));
         }
-
-        // if (mobileNumber && userName) {
-        //     updatedData = { userName: userName }
-        //     data = { mobileNumber: mobileNumber }
-        // } else if (email && userName) {
-        //     updatedData = { userName: userName }
-        //     data = { email: email }
-        // } else {
-        //     res.json({ status: 1, message: 'Invalid Request' });
-        //     return;
-        // }
-        // User.findOne(UserModel, updatedData)
-        //     .then((user) => {
-        //         if (user) {
-        //             res.status(404);
-        //             res.json(notFoundError('User Name Already Exists!'))
-        //         } else {
-        //             User.update(UserModel, data, updatedData)
-        //                 .then(() => {
-        //                     res.status(200);
-        //                     res.json({ status: 200, message: 'userName updated', data: {} });
-        //                 }).catch((e) => {
-        //                     res.status(500);
-        //                     res.json(serverError(e))
-        //                 })
-        //         }
-        //     }).catch((e) => {
-        //         res.status(500);
-        //         res.json(serverError(e))
-        //     })
     }
 }
 
