@@ -235,40 +235,40 @@ export class UserController extends BaseAPIController {
     //         })
     // }
 
-    // verifyCode = (req, res) => {
-    //     let { mobile, email, verification_code } = req.body;
-    //     const UserModel = req.User;
-    //     let data = {};
-    //     if (mobile && verification_code && country_code) {
-    //         data = { mobile: mobile, verification_code: Number(verification_code) }
-    //     } else if (email && verification_code) {
-    //         data = { email: email, verification_code: Number(verification_code) }
-    //     } else {
-    //         res.status(400)
-    //         res.json(successResponse(400, {}, 'INVALID_DETAILS'));
-    //         return;
-    //     }
-    //     User.findOne(UserModel, data)
-    //         .then((user) => {
-    //             if (!user) {
-    //                 res.status(404);
-    //                 res.json(successResponse(400, '{}', 'USER_NOT_FOUND'));
-    //             } else {
-    //                 let updatedData = { is_verify: 1 };
-    //                 User.update(UserModel, data, updatedData)
-    //                     .then(() => {
-    //                         res.status(200);
-    //                         res.json(successResponse(200, user, 'OTP_MATCHED_SUCCESSFULLY'));
-    //                     }).catch((e) => {
-    //                         res.status(500);
-    //                         res.json(successResponse(500, e, 'Error'));
-    //                     })
-    //             }
-    //         }).catch((e) => {
-    //             res.status(500);
-    //             res.json(successResponse(500, e, 'Error'));
-    //         })
-    // }
+    verifyCode = (req, res) => {
+        let { mobile, email, verification_code } = req.param;
+        const UserModel = req.User;
+        let data = {};
+        if (mobile && verification_code) {
+            data = { mobile: mobile, verification_code: Number(verification_code) }
+        } else if (email && verification_code) {
+            data = { email: email, verification_code: Number(verification_code) }
+        } else {
+            res.status(400)
+            res.json(successResponse(400, {}, 'INVALID_DETAILS'));
+            return;
+        }
+        User.findOne(UserModel, data)
+            .then((user) => {
+                if (!user) {
+                    res.status(404);
+                    res.json(successResponse(400, '{}', 'USER_NOT_FOUND'));
+                } else {
+                    let updatedData = { is_verify: 1, status: 2 };
+                    User.update(UserModel, data, updatedData)
+                        .then(() => {
+                            res.status(200);
+                            res.json(successResponse(200, { access_token: user.get('access_token'), status: 2 }, 'OTP_MATCHED_SUCCESSFULLY'));
+                        }).catch((e) => {
+                            res.status(500);
+                            res.json(successResponse(500, e, 'Error'));
+                        })
+                }
+            }).catch((e) => {
+                res.status(500);
+                res.json(successResponse(500, e, 'Error'));
+            })
+    }
 
     // resendOTP = (req, res) => {
     //     let { mobile, email } = req.body;
