@@ -236,7 +236,7 @@ export class UserController extends BaseAPIController {
     // }
 
     verifyCode = (req, res) => {
-        let { mobile, email, verification_code } = req.param;
+        let { mobile, email, verification_code } = req.body;
         const UserModel = req.User;
         let data = {};
         if (mobile && verification_code) {
