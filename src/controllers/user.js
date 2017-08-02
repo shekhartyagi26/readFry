@@ -150,8 +150,6 @@ export class UserController extends BaseAPIController {
     socialLogin = (req, res) => {
         let body = req.body;
         let user = body.user;
-        console.log(body);
-        res.send(body)
         if (!user) {
             res.json({ error: 1, message: 'INVALID_DETAILS' });
             return;
@@ -175,7 +173,7 @@ export class UserController extends BaseAPIController {
                 .then((user_details) => {
                     if (user_details) {
                         res.status(200)
-                        res.json(successResponse(200, user, 'USER_ALREADY_EXISTS'));
+                        res.json(successResponse(200, user_details, 'USER_ALREADY_EXISTS'));
                     } else {
                         User.save(UserModel, user)
                             .then((userData) => {
