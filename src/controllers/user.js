@@ -24,8 +24,8 @@ export class UserController extends BaseAPIController {
         } else if (email && password) {
             data = { email: email }
         } else {
-            res.status(400)
-            res.json(successResponse(400, {}, 'PARAMETER_MISSING'));
+            res.status(100)
+            res.json(successResponse(100, {}, 'Some parameter missing.'));
             return;
         }
         var md5 = crypto.createHash('md5');
@@ -39,26 +39,27 @@ export class UserController extends BaseAPIController {
                     UserModel.findOneAndUpdate(data, { $set: { "access_token": access_token }, returnNewDocument: true, upsert: true }, (err, insertData) => {
                         if (err) {
                             res.status(500);
-                            res.json(successResponse(500, err, 'ERROR'));
+                            res.json(successResponse(500, err, 'Error.'));
                         } else {
                             if (insertData) {
                                 insertData.access_token = access_token;
                                 delete insertData.get('password')
                                 res.status(200);
-                                res.json(successResponse(200, insertData, 'LOGIN_SUCCESS'));
+                                res.json(successResponse(200, insertData, 'Logged in successfully.'));
                             } else {
-                                res.status(400);
-                                res.json(successResponse(400, {}, 'INVALID_ACCESS_TOKEN'));
+
+                                res.status(101);
+                                res.json(successResponse(101, {}, 'Invalid access token.'));
                             }
                         }
                     });
                 } else {
-                    res.status(400);
-                    res.json(successResponse(400, {}, 'USER_NOT_FOUND'));
+                    res.status(201);
+                    res.json(successResponse(201, {}, 'User not found.'));
                 }
             }).catch((e) => {
                 res.status(500);
-                res.json(successResponse(500, e, 'ERROR'));
+                res.json(successResponse(500, e, 'Error.'));
             })
     }
 
@@ -67,8 +68,8 @@ export class UserController extends BaseAPIController {
         var user_details = body.user;
         let UserModel = req.User;
         if (!user_details) {
-            res.status(400)
-            res.json(successResponse(400, {}, 'PARAMETER_MISSING111'));
+            res.status(100)
+            res.json(successResponse(100, {}, 'Some parameter missing.'));
             return;
         }
         let data = {};
@@ -79,15 +80,15 @@ export class UserController extends BaseAPIController {
         } else if (email && password) {
             data = { email: email }
         } else {
-            res.status(400)
-            res.json(successResponse(400, {}, 'PARAMETER_MISSING'));
+            res.status(100)
+            res.json(successResponse(100, {}, 'Some parameter missing.'));
             return;
         }
         User.findOne(UserModel, data)
             .then((user) => {
                 if (user) {
-                    res.status(404)
-                    res.json(successResponse(404, {}, 'USER_ALREADY_EXISTS'));
+                    res.status(200)
+                    res.json(successResponse(200, {}, 'User already exist.'));
                 } else {
                     let md5 = crypto.createHash('md5');
                     md5.update(password);
@@ -111,14 +112,14 @@ export class UserController extends BaseAPIController {
                                         User.update(UserModel, data, updatedData)
                                             .then((data) => {
                                                 res.status(200)
-                                                res.json(successResponse(200, { access_token: updatedData.access_token, status: 1, mobile: mobile }, 'AN_OTP_HAS_BEEN_SENT,PLEASE_VERIFY_OTP'));
+                                                res.json(successResponse(200, { access_token: updatedData.access_token, status: 1, mobile: mobile }, 'An OTP has been sent,please verify.'));
                                             }).catch((e) => {
                                                 res.status(500);
-                                                res.json(successResponse(500, e, 'ERROR'));
+                                                res.json(successResponse(500, e, 'Error.'));
                                             })
                                     }).catch((e) => {
                                         res.status(500);
-                                        res.json(successResponse(500, e, 'ERROR'));
+                                        res.json(successResponse(500, e, 'Error.'));
                                     })
                             } else {
                                 mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
@@ -126,25 +127,25 @@ export class UserController extends BaseAPIController {
                                         User.update(UserModel, data, updatedData)
                                             .then(() => {
                                                 res.status(200)
-                                                res.json(successResponse(200, { access_token: updatedData.access_token, status: 1, email: email }, 'AN_EMAIL_HAS_BEEN_SENT, PLEASE_VERIFY_OTP'));
+                                                res.json(successResponse(200, { access_token: updatedData.access_token, status: 1, email: email }, 'An Email has been sent , please verify.'));
                                             }).catch((e) => {
                                                 res.status(500);
-                                                res.json(successResponse(500, e, 'ERROR'));
+                                                res.json(successResponse(500, e, 'Error.'));
                                             })
                                     })
                                     .catch((e) => {
                                         res.status(500);
-                                        res.json(successResponse(500, e, 'ERROR'));
+                                        res.json(successResponse(500, e, 'Error.'));
                                     });
                             }
                         }).catch((e) => {
                             res.status(500);
-                            res.json(successResponse(500, e, 'ERROR'));
+                            res.json(successResponse(500, e, 'Error.'));
                         })
                 }
             }).catch((e) => {
                 res.status(500);
-                res.json(successResponse(500, e, 'ERROR'));
+                res.json(successResponse(500, e, 'Error.'));
             })
     }
 
@@ -152,7 +153,8 @@ export class UserController extends BaseAPIController {
         let body = req.body;
         let user = body.user;
         if (!user) {
-            res.json({ error: 1, message: 'INVALID_DETAILS' });
+            res.status(100)
+            res.json(successResponse(100, {}, 'Some parameter missing.'));
             return;
         }
         let password = '';
@@ -174,7 +176,7 @@ export class UserController extends BaseAPIController {
                 .then((user_details) => {
                     if (user_details) {
                         res.status(200)
-                        res.json(successResponse(200, user_details, 'USER_ALREADY_EXISTS'));
+                        res.json(successResponse(200, user_details, 'Logged in successfully.'));
                     } else {
                         User.save(UserModel, user)
                             .then((userData) => {
@@ -183,23 +185,23 @@ export class UserController extends BaseAPIController {
                                 User.update(UserModel, { fb_id: fb_id }, { access_token: access_token })
                                     .then(() => {
                                         res.status(200)
-                                        res.json(successResponse(200, userData, 'USER_CREATED_SUCESSFULLY'));
+                                        res.json(successResponse(200, userData, 'Logged in successfully.'));
                                     }).catch((e) => {
                                         res.status(500);
-                                        res.json(successResponse(500, e, 'ERROR'));
+                                        res.json(successResponse(500, e, 'Error.'));
                                     })
                             }).catch((e) => {
                                 res.status(500);
-                                res.json(successResponse(500, e, 'ERROR'));
+                                res.json(successResponse(500, e, 'Error.'));
                             })
                     }
                 }).catch((e) => {
                     res.status(500);
-                    res.json(successResponse(500, e, 'ERROR'));
+                    res.json(successResponse(500, e, 'Error.'));
                 })
         } else {
-            res.status(500);
-            res.json(successResponse(500, e, 'INVALID_DETAILS'));
+            res.status(100)
+            res.json(successResponse(100, {}, 'Some parameter missing.'));
         }
     }
 
@@ -212,29 +214,29 @@ export class UserController extends BaseAPIController {
         } else if (email && verification_code) {
             data = { email: email, verification_code: Number(verification_code) }
         } else {
-            res.status(400)
-            res.json(successResponse(400, {}, 'INVALID_DETAILS'));
+            res.status(100)
+            res.json(successResponse(100, {}, 'Some parameter missing.'));
             return;
         }
         User.findOne(UserModel, data)
             .then((user) => {
                 if (!user) {
-                    res.status(404);
-                    res.json(successResponse(400, '{}', 'USER_NOT_FOUND'));
+                    res.status(201);
+                    res.json(successResponse(201, {}, 'User not found.'));
                 } else {
                     let updatedData = { is_verify: 1, status: 2 };
                     User.update(UserModel, data, updatedData)
                         .then(() => {
                             res.status(200);
-                            res.json(successResponse(200, { access_token: user.get('access_token'), status: 2 }, 'OTP_MATCHED_SUCCESSFULLY'));
+                            res.json(successResponse(200, { access_token: user.get('access_token'), status: 2 }, 'OTP match successfully.'));
                         }).catch((e) => {
                             res.status(500);
-                            res.json(successResponse(500, e, 'Error'));
+                            res.json(successResponse(500, e, 'Error.'));
                         })
                 }
             }).catch((e) => {
                 res.status(500);
-                res.json(successResponse(500, e, 'Error'));
+                res.json(successResponse(500, e, 'Error.'));
             })
     }
 
@@ -248,15 +250,15 @@ export class UserController extends BaseAPIController {
         } else if (email) {
             data = { email: email }
         } else {
-            res.status(400)
-            res.json(successResponse(400, {}, 'INVALID_DETAILS'));
+            res.status(100)
+            res.json(successResponse(100, {}, 'Some parameter missing.'));
             return;
         }
         User.findOne(UserModel, data)
             .then((user) => {
                 if (!user) {
-                    res.status(404);
-                    res.json(successResponse(400, '{}', 'USER_NOT_FOUND'));
+                    res.status(201);
+                    res.json(successResponse(201, {}, 'User not found.'));
                 } else {
                     let verificationCode = Math.ceil(Math.random() * 10000);
                     let updatedData = { verificationCode: verificationCode }
@@ -266,14 +268,14 @@ export class UserController extends BaseAPIController {
                                 User.update(UserModel, data, updatedData)
                                     .then(() => {
                                         res.status(200);
-                                        res.json(successResponse(200, '{}', 'PLEASE_VERIFY_OTP'));
+                                        res.json(successResponse(200, '{}', 'An OTP has been sent,please verify.'));
                                     }).catch((e) => {
                                         res.status(500);
-                                        res.json(successResponse(500, e, 'Error'));
+                                        res.json(successResponse(500, e, 'Error.'));
                                     })
                             }).catch((e) => {
                                 res.status(500);
-                                res.json(successResponse(500, e, 'Error'));
+                                res.json(successResponse(500, e, 'Error.'));
                             })
                     } else {
                         mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verificationCode)
@@ -281,21 +283,21 @@ export class UserController extends BaseAPIController {
                                 User.update(UserModel, data, updatedData)
                                     .then(() => {
                                         res.status(200);
-                                        res.json(successResponse(200, '{}', 'PLEASE_VERIFY_OTP'));
+                                        res.json(successResponse(200, '{}', 'An Email has been sent,please verify.'));
                                     }).catch((e) => {
                                         res.status(500);
-                                        res.json(successResponse(500, e, 'Error'));
+                                        res.json(successResponse(500, e, 'Error.'));
                                     })
                             })
                             .catch((e) => {
                                 res.status(500);
-                                res.json(successResponse(500, e, 'Error'));
+                                res.json(successResponse(500, e, 'Error.'));
                             });
                     }
                 }
             }).catch((e) => {
                 res.status(500);
-                res.json(successResponse(500, e, 'Error'));
+                res.json(successResponse(500, e, 'Error.'));
             })
     }
 
@@ -306,20 +308,20 @@ export class UserController extends BaseAPIController {
             User.findOne(UserModel, { user_name: user_name })
                 .then((userDetails) => {
                     if (userDetails) {
-                        res.status(400);
-                        res.json(successResponse(400, e, 'USERNAME_ALREADY_EXIST'));
+                        res.status(200)
+                        res.json(successResponse(200, {}, 'UserName already exist.'));
                     } else {
                         UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { "user_name": user_name, "status": 3 }, returnNewDocument: true }, (err, insertData) => {
                             if (err) {
                                 res.status(500);
-                                res.json(successResponse(500, err, 'ERROR'));
+                                res.json(successResponse(500, err, 'Error.'));
                             } else {
                                 if (insertData) {
                                     res.status(200);
-                                    res.json(successResponse(200, { access_token: access_token, status: 3 }, 'USERNAME_SAVED'));
+                                    res.json(successResponse(200, { access_token: access_token, status: 3 }, 'UserName Saved successfully.'));
                                 } else {
-                                    res.status(400);
-                                    res.json(successResponse(400, {}, 'INVALID_ACCESS_TOKEN'));
+                                    res.status(101);
+                                    res.json(successResponse(101, {}, 'Invalid access token.'));
                                 }
                             }
                         });
@@ -327,11 +329,11 @@ export class UserController extends BaseAPIController {
                     }
                 }).catch((e) => {
                     res.status(500);
-                    res.json(successResponse(500, e, 'ERROR'));
+                    res.json(successResponse(500, e, 'Error.'));
                 })
         } else {
-            res.status(400)
-            res.json(successResponse(400, {}, 'INVALID_DETAILS'));
+            res.status(100)
+            res.json(successResponse(100, {}, 'Some parameter missing.'));
         }
     }
 }
