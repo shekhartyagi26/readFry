@@ -87,8 +87,8 @@ export class UserController extends BaseAPIController {
         User.findOne(UserModel, data)
             .then((user) => {
                 if (user) {
-                    res.status(SUCCESS)
-                    res.json(successResponse(SUCCESS, {}, 'User already exist.'));
+                    res.status(ERROR)
+                    res.json(successResponse(ERROR, {}, 'User already exist.'));
                 } else {
                     let md5 = crypto.createHash('md5');
                     md5.update(password);
@@ -243,7 +243,7 @@ export class UserController extends BaseAPIController {
     }
 
 
-    forgot_password = (req, res) => {
+    forgotPassword = (req, res) => {
         let { mobile, email } = req.body;
         const UserModel = req.User;
         let data = {};

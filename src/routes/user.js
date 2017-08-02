@@ -17,7 +17,7 @@ export default (app) => {
     app.route("/user/verifyCode").post(user.verifyCode);
 
     /* Route for forgot Password */
-    app.route("/user/forgot_password").post(user.forgot_password);
+    app.route("/user/forgotPassword").post(user.forgotPassword);
 
     /* Route for create UserName */
     app.route("/user/createUserName").post(user.createUserName);
