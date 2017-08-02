@@ -22,5 +22,14 @@ export default (app) => {
     /* Route for create UserName */
     app.route("/user/createUserName").post(user.createUserName);
 
+    /* Route for save Personal Details */
+    app.route("/user/savePersonalDetails").post(user.savePersonalDetails);
+
+    /* Route for save Personal Details */
+    app.route("/user/getInterests").get(user.intrestingTopics);
+
+    /* Route for save Personal Details */
+    app.route("/user/saveInterest").post(user.saveInterest);
+
     return app;
 };

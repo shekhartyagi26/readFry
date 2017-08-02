@@ -13,8 +13,10 @@ export class ImageController extends BaseAPIController {
             let data = { "access_token": access_token };
             UserModel.findOneAndUpdate(data, { $set: { profilePicture: req.file, status: 3 }, returnNewDocument: true, upsert: true }, (err, insertData) => {
                 if (err) {
-                    res.status(ERROR);
-                    res.json(successResponse(ERROR, err, 'Error.'));
+                    fs.unlink(req.file.path, function() {
+                        res.status(ERROR);
+                        res.json(successResponse(ERROR, err, 'Error.'));
+                    })
                 } else {
                     if (insertData) {
                         res.status(SUCCESS);
@@ -22,8 +24,10 @@ export class ImageController extends BaseAPIController {
                         data.status = 3;
                         res.json(successResponse(SUCCESS, data, 'Image Upload Successfully.'));
                     } else {
-                        res.status(ERROR);
-                        res.json(successResponse(ERROR, {}, 'Invalid access token.'));
+                        fs.unlink(req.file.path, function() {
+                            res.status(ERROR)
+                            res.json(successResponse(ERROR, {}, 'Invalid Token.'));
+                        })
                     }
                 }
             });
