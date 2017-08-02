@@ -5,6 +5,7 @@ import generatePassword from 'password-generator';
 import crypto from 'crypto';
 import config from "../../config.json";
 import { getSuccess, notFoundError, serverError, getSuccessMessage, validateEmail, successResponse } from "../modules/generic";
+import { SUCCESS, ERROR } from "../modules/constant";
 import twilio from "../modules/twilio";
 import mail from "../modules/mail";
 import constant from "../models/constant";
@@ -24,8 +25,8 @@ export class UserController extends BaseAPIController {
         } else if (email && password) {
             data = { email: email }
         } else {
-            res.status(100)
-            res.json(successResponse(100, {}, 'Some parameter missing.'));
+            res.status(ERROR)
+            res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
             return;
         }
         var md5 = crypto.createHash('md5');
@@ -38,28 +39,28 @@ export class UserController extends BaseAPIController {
                     let access_token = encodeToken(user._id)
                     UserModel.findOneAndUpdate(data, { $set: { "access_token": access_token }, returnNewDocument: true, upsert: true }, (err, insertData) => {
                         if (err) {
-                            res.status(500);
-                            res.json(successResponse(500, err, 'Error.'));
+                            res.status(ERROR);
+                            res.json(successResponse(ERROR, err, 'Error.'));
                         } else {
                             if (insertData) {
                                 insertData.access_token = access_token;
                                 delete insertData.get('password')
-                                res.status(200);
-                                res.json(successResponse(200, insertData, 'Logged in successfully.'));
+                                res.status(SUCCESS);
+                                res.json(successResponse(SUCCESS, insertData, 'Logged in successfully.'));
                             } else {
 
-                                res.status(101);
-                                res.json(successResponse(101, {}, 'Invalid access token.'));
+                                res.status(ERROR);
+                                res.json(successResponse(ERROR, {}, 'Invalid access token.'));
                             }
                         }
                     });
                 } else {
-                    res.status(201);
-                    res.json(successResponse(201, {}, 'User not found.'));
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, {}, 'User not found.'));
                 }
             }).catch((e) => {
-                res.status(500);
-                res.json(successResponse(500, e, 'Error.'));
+                res.status(ERROR);
+                res.json(successResponse(ERROR, e, 'Error.'));
             })
     }
 
@@ -68,8 +69,8 @@ export class UserController extends BaseAPIController {
         var user_details = body.user;
         let UserModel = req.User;
         if (!user_details) {
-            res.status(100)
-            res.json(successResponse(100, {}, 'Some parameter missing.'));
+            res.status(ERROR)
+            res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
             return;
         }
         let data = {};
@@ -79,15 +80,15 @@ export class UserController extends BaseAPIController {
         } else if (email && password) {
             data = { email: email }
         } else {
-            res.status(100)
-            res.json(successResponse(100, {}, 'Some parameter missing.'));
+            res.status(ERROR)
+            res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
             return;
         }
         User.findOne(UserModel, data)
             .then((user) => {
                 if (user) {
-                    res.status(200)
-                    res.json(successResponse(200, {}, 'User already exist.'));
+                    res.status(SUCCESS)
+                    res.json(successResponse(SUCCESS, {}, 'User already exist.'));
                 } else {
                     let md5 = crypto.createHash('md5');
                     md5.update(password);
@@ -112,41 +113,41 @@ export class UserController extends BaseAPIController {
                                     .then((result) => {
                                         User.update(UserModel, data, updatedData)
                                             .then((data) => {
-                                                res.status(200)
-                                                res.json(successResponse(200, { access_token: updatedData.access_token, status: 1, mobile: mobile }, 'An OTP has been sent,please verify.'));
+                                                res.status(SUCCESS)
+                                                res.json(successResponse(SUCCESS, { access_token: updatedData.access_token, status: 1, mobile: mobile }, 'An OTP has been sent,please verify.'));
                                             }).catch((e) => {
-                                                res.status(500);
-                                                res.json(successResponse(500, e, 'Error.'));
+                                                res.status(ERROR);
+                                                res.json(successResponse(ERROR, e, 'Error.'));
                                             })
                                     }).catch((e) => {
-                                        res.status(500);
-                                        res.json(successResponse(500, e, 'Error.'));
+                                        res.status(ERROR);
+                                        res.json(successResponse(ERROR, e, 'Error.'));
                                     })
                             } else {
                                 mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
                                     .then((response) => {
                                         User.update(UserModel, data, updatedData)
                                             .then(() => {
-                                                res.status(200)
-                                                res.json(successResponse(200, { access_token: updatedData.access_token, status: 1, email: email }, 'An Email has been sent , please verify.'));
+                                                res.status(SUCCESS)
+                                                res.json(successResponse(SUCCESS, { access_token: updatedData.access_token, status: 1, email: email }, 'An Email has been sent , please verify.'));
                                             }).catch((e) => {
-                                                res.status(500);
-                                                res.json(successResponse(500, e, 'Error.'));
+                                                res.status(ERROR);
+                                                res.json(successResponse(ERROR, e, 'Error.'));
                                             })
                                     })
                                     .catch((e) => {
-                                        res.status(500);
-                                        res.json(successResponse(500, e, 'Error.'));
+                                        res.status(ERROR);
+                                        res.json(successResponse(ERROR, e, 'Error.'));
                                     });
                             }
                         }).catch((e) => {
-                            res.status(500);
-                            res.json(successResponse(500, e, 'Error.'));
+                            res.status(ERROR);
+                            res.json(successResponse(ERROR, e, 'Error.'));
                         })
                 }
             }).catch((e) => {
-                res.status(500)
-                res.json(successResponse(500, e, 'Error.'));
+                res.status(ERROR)
+                res.json(successResponse(ERROR, e, 'Error.'));
             })
     }
 
@@ -154,8 +155,8 @@ export class UserController extends BaseAPIController {
         let body = req.body;
         let user = body.user;
         if (!user) {
-            res.status(100)
-            res.json(successResponse(100, {}, 'Some parameter missing.'));
+            res.status(ERROR)
+            res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
             return;
         }
         let password = '';
@@ -176,8 +177,8 @@ export class UserController extends BaseAPIController {
             User.findOne(UserModel, { fb_id: fb_id })
                 .then((user_details) => {
                     if (user_details) {
-                        res.status(200)
-                        res.json(successResponse(200, user_details, 'Logged in successfully.'));
+                        res.status(SUCCESS)
+                        res.json(successResponse(SUCCESS, user_details, 'Logged in successfully.'));
                     } else {
                         User.save(UserModel, user)
                             .then((userData) => {
@@ -185,24 +186,24 @@ export class UserController extends BaseAPIController {
                                 userData.access_token = access_token
                                 User.update(UserModel, { fb_id: fb_id }, { access_token: access_token })
                                     .then(() => {
-                                        res.status(200)
-                                        res.json(successResponse(200, userData, 'Logged in successfully.'));
+                                        res.status(SUCCESS)
+                                        res.json(successResponse(SUCCESS, userData, 'Logged in successfully.'));
                                     }).catch((e) => {
-                                        res.status(500);
-                                        res.json(successResponse(500, e, 'Error.'));
+                                        res.status(ERROR);
+                                        res.json(successResponse(ERROR, e, 'Error.'));
                                     })
                             }).catch((e) => {
-                                res.status(500);
-                                res.json(successResponse(500, e, 'Error.'));
+                                res.status(ERROR);
+                                res.json(successResponse(ERROR, e, 'Error.'));
                             })
                     }
                 }).catch((e) => {
-                    res.status(500);
-                    res.json(successResponse(500, e, 'Error.'));
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, e, 'Error.'));
                 })
         } else {
-            res.status(100)
-            res.json(successResponse(100, {}, 'Some parameter missing.'));
+            res.status(ERROR)
+            res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
         }
     }
 
@@ -215,29 +216,29 @@ export class UserController extends BaseAPIController {
         } else if (email && verification_code) {
             data = { email: email, verification_code: Number(verification_code) }
         } else {
-            res.status(100)
-            res.json(successResponse(100, {}, 'Some parameter missing.'));
+            res.status(ERROR)
+            res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
             return;
         }
         User.findOne(UserModel, data)
             .then((user) => {
                 if (!user) {
-                    res.status(201);
-                    res.json(successResponse(201, {}, 'User not found.'));
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, {}, 'User not found.'));
                 } else {
                     let updatedData = { is_verify: 1, status: 2 };
                     User.update(UserModel, data, updatedData)
                         .then(() => {
-                            res.status(200);
-                            res.json(successResponse(200, { access_token: user.get('access_token'), status: 2 }, 'OTP match successfully.'));
+                            res.status(SUCCESS);
+                            res.json(successResponse(SUCCESS, { access_token: user.get('access_token'), status: 2 }, 'OTP match successfully.'));
                         }).catch((e) => {
-                            res.status(500);
-                            res.json(successResponse(500, e, 'Error.'));
+                            res.status(ERROR);
+                            res.json(successResponse(ERROR, e, 'Error.'));
                         })
                 }
             }).catch((e) => {
-                res.status(500);
-                res.json(successResponse(500, e, 'Error.'));
+                res.status(ERROR);
+                res.json(successResponse(ERROR, e, 'Error.'));
             })
     }
 
@@ -251,15 +252,15 @@ export class UserController extends BaseAPIController {
         } else if (email) {
             data = { email: email }
         } else {
-            res.status(100)
-            res.json(successResponse(100, {}, 'Some parameter missing.'));
+            res.status(ERROR)
+            res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
             return;
         }
         User.findOne(UserModel, data)
             .then((user) => {
                 if (!user) {
-                    res.status(201);
-                    res.json(successResponse(201, {}, 'User not found.'));
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, {}, 'User not found.'));
                 } else {
                     let verificationCode = Math.ceil(Math.random() * 10000);
                     let updatedData = { verificationCode: verificationCode }
@@ -268,37 +269,37 @@ export class UserController extends BaseAPIController {
                             .then((result) => {
                                 User.update(UserModel, data, updatedData)
                                     .then(() => {
-                                        res.status(200);
-                                        res.json(successResponse(200, '{}', 'An OTP has been sent,please verify.'));
+                                        res.status(SUCCESS);
+                                        res.json(successResponse(SUCCESS, '{}', 'An OTP has been sent,please verify.'));
                                     }).catch((e) => {
-                                        res.status(500);
-                                        res.json(successResponse(500, e, 'Error.'));
+                                        res.status(ERROR);
+                                        res.json(successResponse(ERROR, e, 'Error.'));
                                     })
                             }).catch((e) => {
-                                res.status(500);
-                                res.json(successResponse(500, e, 'Error.'));
+                                res.status(ERROR);
+                                res.json(successResponse(ERROR, e, 'Error.'));
                             })
                     } else {
                         mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verificationCode)
                             .then((response) => {
                                 User.update(UserModel, data, updatedData)
                                     .then(() => {
-                                        res.status(200);
-                                        res.json(successResponse(200, '{}', 'An Email has been sent,please verify.'));
+                                        res.status(SUCCESS);
+                                        res.json(successResponse(SUCCESS, '{}', 'An Email has been sent,please verify.'));
                                     }).catch((e) => {
-                                        res.status(500);
-                                        res.json(successResponse(500, e, 'Error.'));
+                                        res.status(ERROR);
+                                        res.json(successResponse(ERROR, e, 'Error.'));
                                     })
                             })
                             .catch((e) => {
-                                res.status(500);
-                                res.json(successResponse(500, e, 'Error.'));
+                                res.status(ERROR);
+                                res.json(successResponse(ERROR, e, 'Error.'));
                             });
                     }
                 }
             }).catch((e) => {
-                res.status(500);
-                res.json(successResponse(500, e, 'Error.'));
+                res.status(ERROR);
+                res.json(successResponse(ERROR, e, 'Error.'));
             })
     }
 
@@ -309,32 +310,32 @@ export class UserController extends BaseAPIController {
             User.findOne(UserModel, { user_name: user_name })
                 .then((userDetails) => {
                     if (userDetails) {
-                        res.status(200)
-                        res.json(successResponse(200, {}, 'UserName already exist.'));
+                        res.status(SUCCESS)
+                        res.json(successResponse(SUCCESS, {}, 'UserName already exist.'));
                     } else {
                         UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { "user_name": user_name, "status": 3 }, returnNewDocument: true }, (err, insertData) => {
                             if (err) {
-                                res.status(500);
-                                res.json(successResponse(500, err, 'Error.'));
+                                res.status(ERROR);
+                                res.json(successResponse(ERROR, err, 'Error.'));
                             } else {
                                 if (insertData) {
-                                    res.status(200);
-                                    res.json(successResponse(200, { access_token: access_token, status: 3 }, 'UserName Saved successfully.'));
+                                    res.status(SUCCESS);
+                                    res.json(successResponse(SUCCESS, { access_token: access_token, status: 3 }, 'UserName Saved successfully.'));
                                 } else {
-                                    res.status(101);
-                                    res.json(successResponse(101, {}, 'Invalid access token.'));
+                                    res.status(ERROR);
+                                    res.json(successResponse(ERROR, {}, 'Invalid access token.'));
                                 }
                             }
                         });
 
                     }
                 }).catch((e) => {
-                    res.status(500);
-                    res.json(successResponse(500, e, 'Error.'));
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, e, 'Error.'));
                 })
         } else {
-            res.status(100)
-            res.json(successResponse(100, {}, 'Some parameter missing.'));
+            res.status(ERROR)
+            res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
         }
     }
 }
