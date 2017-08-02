@@ -15,8 +15,7 @@ export default (app) => {
         }
     });
     var upload = multer({ storage: storage });
-    /* Route for create UserName */
-    // app.route("/upload/profileImage").post(image.profileImage);
+    
     app.post('/upload/profileImage', upload.single('file'), image.profileImage);
 
     return app;
