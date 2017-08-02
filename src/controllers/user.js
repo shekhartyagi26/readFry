@@ -74,7 +74,6 @@ export class UserController extends BaseAPIController {
         }
         let data = {};
         let { mobile, email, password } = body.user;
-        console.log(mobile, email, password)
         if (mobile && password) {
             data = { mobile: mobile }
         } else if (email && password) {
@@ -103,7 +102,9 @@ export class UserController extends BaseAPIController {
                     user_details.status = 1;
                     User.save(UserModel, user_details)
                         .then((userData) => {
-                            let verification_code = Math.ceil(Math.random() * 10000);
+                            // let verification_code = Math.ceil(Math.random() * 10000);
+
+                            let verification_code = 123456;
                             let updatedData = { verification_code: verification_code }
                             updatedData.access_token = encodeToken(userData._id);
                             if (mobile) {
@@ -144,7 +145,7 @@ export class UserController extends BaseAPIController {
                         })
                 }
             }).catch((e) => {
-                res.status(500);
+                res.status(500)
                 res.json(successResponse(500, e, 'Error.'));
             })
     }

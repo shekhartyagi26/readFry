@@ -1,7 +1,6 @@
 import nodemailer from "nodemailer";
 import smtpTransport from "nodemailer-smtp-transport";
 import config from "../../config.json";
-import emailExistence from "email-existence";
 
 module.exports = {
     sendMail: function(email, subject, text, from, html) {
@@ -14,25 +13,19 @@ module.exports = {
                     pass: config.SMTP_PASS
                 }
             }));
-            emailExistence.check(email, function(err, res) {
-                if (res) {
-                    mailer.sendMail({
-                        from: from,
-                        to: email,
-                        subject: subject,
-                        template: text,
-                        html: html
-                    }, (error, response) => {
-                        if (error) {
-                            reject("messsage not send successfully");
-                        } else {
-                            resolve({ message: "messsage send successfully" });
-                        }
-                        mailer.close();
-                    });
+            mailer.sendMail({
+                from: from,
+                to: email,
+                subject: subject,
+                template: text,
+                html: html
+            }, (error, response) => {
+                if (error) {
+                    reject("messsage not send successfully");
                 } else {
-                    reject("Invalid Email Details");
+                    resolve({ message: "messsage send successfully" });
                 }
+                mailer.close();
             });
         })
     }
