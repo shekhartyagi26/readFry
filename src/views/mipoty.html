@@ -30,12 +30,13 @@
             var mobileNumber = $("#mobileNumber").val();
             var departmentName = $("#departmentName").val();
             $.ajax({
-                url: "http://localhost:3001/user/socialLogin",
+                url: "http://localhost:3001/user/signUp",
                 // url: "http://18.220.66.102:3001/user/createUserName",
                 type: 'post',
                 data: {
                     "user": {
                         "email": "harshtanwar41@yahoo.com",
+                        "password":"121323",
                         "device_type": "android",
                         "device_token": "1234567890",
                         "fb_id": "1485036438222368"

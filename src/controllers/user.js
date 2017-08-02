@@ -68,11 +68,12 @@ export class UserController extends BaseAPIController {
         let UserModel = req.User;
         if (!user_details) {
             res.status(400)
-            res.json(successResponse(400, {}, 'PARAMETER_MISSING'));
+            res.json(successResponse(400, {}, 'PARAMETER_MISSING111'));
             return;
         }
         let data = {};
         let { mobile, email, password } = body.user;
+        console.log(mobile, email, password)
         if (mobile && password) {
             data = { mobile: mobile }
         } else if (email && password) {
