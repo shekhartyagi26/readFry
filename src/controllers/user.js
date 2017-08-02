@@ -171,7 +171,7 @@ export class UserController extends BaseAPIController {
             user.is_deleted = 0;
             user.is_blocked = 0;
             user.modified_on = new Date();
-            user.status = 3;
+            user.status = 4;
             const UserModel = req.User;
             var userObj = user;
             User.findOne(UserModel, { fb_id: fb_id })
@@ -313,14 +313,14 @@ export class UserController extends BaseAPIController {
                         res.status(SUCCESS)
                         res.json(successResponse(SUCCESS, {}, 'UserName already exist.'));
                     } else {
-                        UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { "user_name": user_name, "status": 3 }, returnNewDocument: true }, (err, insertData) => {
+                        UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { "user_name": user_name, "status": 4 }, returnNewDocument: true }, (err, insertData) => {
                             if (err) {
                                 res.status(ERROR);
                                 res.json(successResponse(ERROR, err, 'Error.'));
                             } else {
                                 if (insertData) {
                                     res.status(SUCCESS);
-                                    res.json(successResponse(SUCCESS, { access_token: access_token, status: 3 }, 'UserName Saved successfully.'));
+                                    res.json(successResponse(SUCCESS, { access_token: access_token, status: 4 }, 'UserName Saved successfully.'));
                                 } else {
                                     res.status(ERROR);
                                     res.json(successResponse(ERROR, {}, 'Invalid access token.'));
