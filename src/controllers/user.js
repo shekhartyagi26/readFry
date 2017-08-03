@@ -269,7 +269,7 @@ export class UserController extends BaseAPIController {
                 } else {
                     // let verificationCode = Math.ceil(Math.random() * 10000);
                     let verification_code = 123456;
-                    let updatedData = { verificationCode: verificationCode }
+                    let updatedData = { verification_code: verification_code }
                     if (mobile) {
                         twilio.sendMessageTwilio(`your Mypoty verification code is: ${verificationCode}`, '+918126724591')
                             .then((result) => {
