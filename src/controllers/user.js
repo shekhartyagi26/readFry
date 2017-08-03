@@ -56,7 +56,7 @@ export class UserController extends BaseAPIController {
                     });
                 } else {
                     res.status(ERROR);
-                    res.json(successResponse(ERROR, {}, 'User not found.'));
+                    res.json(successResponse(ERROR, {}, 'The username or password you entered is incorrect.'));
                 }
             }).catch((e) => {
                 res.status(ERROR);
