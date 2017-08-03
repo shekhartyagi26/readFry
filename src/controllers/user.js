@@ -303,7 +303,8 @@ export class UserController extends BaseAPIController {
     }
 
     createUserName = (req, res) => {
-        let { access_token, user_name } = req.body;
+        let { access_token } = req.headers;
+        let { user_name } = req.body;
         let UserModel = req.User;
         if (access_token && user_name) {
             User.findOne(UserModel, { user_name: user_name })
@@ -339,7 +340,7 @@ export class UserController extends BaseAPIController {
     }
 
     savePersonalDetails = (req, res) => {
-        let { access_token } = req.body;
+        let { access_token } = req.headers;
         let body = req.body;
         let user = body.user;
         if (!user) {
@@ -383,7 +384,8 @@ export class UserController extends BaseAPIController {
     }
 
     saveInterest = (req, res) => {
-        let { access_token, list } = req.body;
+        let { access_token } = req.headers;
+        let { list } = req.body;
         if (!list && !Array.isArray(list)) {
             list = [];
         }
