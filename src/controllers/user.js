@@ -267,11 +267,11 @@ export class UserController extends BaseAPIController {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, {}, 'User not found.'));
                 } else {
-                    // let verificationCode = Math.ceil(Math.random() * 10000);
+                    // let verification_code = Math.ceil(Math.random() * 10000);
                     let verification_code = 123456;
                     let updatedData = { verification_code: verification_code }
                     if (mobile) {
-                        twilio.sendMessageTwilio(`your Mypoty verification code is: ${verificationCode}`, '+918126724591')
+                        twilio.sendMessageTwilio(`your Mypoty verification code is: ${verification_code}`, '+918126724591')
                             .then((result) => {
                                 User.update(UserModel, data, updatedData)
                                     .then(() => {
@@ -286,7 +286,7 @@ export class UserController extends BaseAPIController {
                                 res.json(successResponse(ERROR, e, 'Error.'));
                             })
                     } else {
-                        mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verificationCode)
+                        mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
                             .then((response) => {
                                 User.update(UserModel, data, updatedData)
                                     .then(() => {
