@@ -473,7 +473,7 @@ export class UserController extends BaseAPIController {
                 } else {
                     if (insertData) {
                         res.status(SUCCESS);
-                        res.json(successResponse(SUCCESS, { access_token: access_token, status: 5 }, 'UserName Saved successfully.'));
+                        res.json(successResponse(SUCCESS, {}, 'password changed successfully.'));
                     } else {
                         res.status(ERROR);
                         res.json(successResponse(ERROR, {}, 'Invalid access token.'));
