@@ -31,5 +31,8 @@ export default (app) => {
     /* Route for save Personal Details */
     app.route("/user/saveInterest").post(user.saveInterest);
 
+    /* Route for logout */
+    app.route("/user/logout").post(user.logout);
+
     return app;
 };

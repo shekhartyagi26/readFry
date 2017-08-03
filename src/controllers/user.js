@@ -408,6 +408,30 @@ export class UserController extends BaseAPIController {
             res.json(successResponse(ERROR, {}, 'access token missing.'));
         }
     }
+
+    logout = (req, res) => {
+        let { access_token } = req.headers;
+        let UserModel = req.User;
+        if (access_token) {
+            UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { access_token: "" }, returnNewDocument: true }, (err, insertData) => {
+                if (err) {
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, err, 'Error.'));
+                } else {
+                    if (insertData) {
+                        res.status(SUCCESS);
+                        res.json(successResponse(SUCCESS, {}, 'User Logout successfully.'));
+                    } else {
+                        res.status(ERROR);
+                        res.json(successResponse(ERROR, {}, 'Invalid access token.'));
+                    }
+                }
+            });
+        } else {
+            res.status(ERROR);
+            res.json(successResponse(ERROR, {}, 'access token missing.'));
+        }
+    }
 }
 
 const controller = new UserController();
