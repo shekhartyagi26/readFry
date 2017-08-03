@@ -6,7 +6,7 @@ var fs = require('fs');
 export class ImageController extends BaseAPIController {
     profileImage = (req, res) => {
         let UserModel = req.User;
-        let { access_token } = req.body
+        let { access_token } = req.headers;
         if (access_token && req.file) {
             let path_name = req.file.originalname
             let type = req.file.mimetype

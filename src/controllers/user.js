@@ -207,7 +207,7 @@ export class UserController extends BaseAPIController {
     }
 
     verifyCode = (req, res) => {
-        let { mobile, email, verification_code } = req.body;
+        let { mobile, email, verification_code, update } = req.body;
         const UserModel = req.User;
         let data = {};
         if (mobile && verification_code) {
@@ -225,7 +225,12 @@ export class UserController extends BaseAPIController {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, {}, 'User not found.'));
                 } else {
-                    let updatedData = { is_verify: 1, status: 2 };
+                    let updatedData;
+                    if (update) {
+                        updatedData = { is_verify: 1, status: 2 };
+                    } else {
+                        updatedData = { is_verify: 1 };
+                    }
                     User.update(UserModel, data, updatedData)
                         .then(() => {
                             res.status(SUCCESS);
@@ -391,7 +396,7 @@ export class UserController extends BaseAPIController {
         }
         let UserModel = req.User;
         if (access_token) {
-            UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { user_interest: list }, returnNewDocument: true }, (err, insertData) => {
+            UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { user_interest: list, status: 6 }, returnNewDocument: true }, (err, insertData) => {
                 if (err) {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, err, 'Error.'));
