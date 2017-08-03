@@ -102,7 +102,7 @@ export class UserController extends BaseAPIController {
                     user_details.status = 1;
                     User.save(UserModel, user_details)
                         .then((userData) => {
-                            let verification_code = Math.ceil(Math.random() * 10000);
+                            // let verification_code = Math.ceil(Math.random() * 10000);
 
                             let verification_code = 123456;
                             let updatedData = { verification_code: verification_code }
@@ -267,7 +267,8 @@ export class UserController extends BaseAPIController {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, {}, 'User not found.'));
                 } else {
-                    let verificationCode = Math.ceil(Math.random() * 10000);
+                    // let verificationCode = Math.ceil(Math.random() * 10000);
+                    let verification_code = 123456;
                     let updatedData = { verificationCode: verificationCode }
                     if (mobile) {
                         twilio.sendMessageTwilio(`your Mypoty verification code is: ${verificationCode}`, '+918126724591')
