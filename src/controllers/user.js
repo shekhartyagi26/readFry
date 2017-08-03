@@ -73,7 +73,7 @@ export class UserController extends BaseAPIController {
             return;
         }
         let data = {};
-        let { mobile, email, password } = body.user;
+        let { mobile, email, password, country_code } = body.user;
         if (mobile && password) {
             data = { mobile: mobile }
         } else if (email && password) {
@@ -102,7 +102,7 @@ export class UserController extends BaseAPIController {
                     user_details.status = 1;
                     User.save(UserModel, user_details)
                         .then((userData) => {
-                            // let verification_code = Math.ceil(Math.random() * 10000);
+                            let verification_code = Math.ceil(Math.random() * 10000);
 
                             let verification_code = 123456;
                             let updatedData = { verification_code: verification_code }
@@ -231,10 +231,11 @@ export class UserController extends BaseAPIController {
                     } else {
                         updatedData = { is_verify: 1 };
                     }
+                    updatedData.access_token = user.get('access_token')
                     User.update(UserModel, data, updatedData)
                         .then(() => {
                             res.status(SUCCESS);
-                            res.json(successResponse(SUCCESS, { access_token: user.get('access_token'), status: 2 }, 'OTP match successfully.'));
+                            res.json(successResponse(SUCCESS, updatedData, 'OTP match successfully.'));
                         }).catch((e) => {
                             res.status(ERROR);
                             res.json(successResponse(ERROR, e, 'Error.'));
