@@ -316,7 +316,7 @@ export class UserController extends BaseAPIController {
                 .then((userDetails) => {
                     if (userDetails) {
                         res.status(SUCCESS)
-                        res.json(successResponse(SUCCESS, {}, 'UserName already exist.'));
+                        res.json(successResponse(ERROR, {}, 'Username has already exist.'));
                     } else {
                         UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { "user_name": user_name, "status": 4 }, returnNewDocument: true }, (err, insertData) => {
                             if (err) {
@@ -428,6 +428,44 @@ export class UserController extends BaseAPIController {
                     if (insertData) {
                         res.status(SUCCESS);
                         res.json(successResponse(SUCCESS, {}, 'User Logout successfully.'));
+                    } else {
+                        res.status(ERROR);
+                        res.json(successResponse(ERROR, {}, 'Invalid access token.'));
+                    }
+                }
+            });
+        } else {
+            res.status(ERROR);
+            res.json(successResponse(ERROR, {}, 'access token missing.'));
+        }
+    }
+
+    resetPassword = (req, res) => {
+        let UserModel = req.User;
+        let data;
+        let { email, password } = req.body;
+        if (mobile && password) {
+            data = { mobile: mobile }
+        } else if (email && password) {
+            data = { email: email }
+        } else {
+            res.status(ERROR)
+            res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
+            return;
+        }
+        var md5 = crypto.createHash('md5');
+        md5.update(password);
+        var pass_md5 = md5.digest('hex');
+
+        if (data) {
+            UserModel.findOneAndUpdate(data, { $set: { password: pass_md5 }, returnNewDocument: true }, (err, insertData) => {
+                if (err) {
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, err, 'Error.'));
+                } else {
+                    if (insertData) {
+                        res.status(SUCCESS);
+                        res.json(successResponse(SUCCESS, { access_token: access_token, status: 5 }, 'UserName Saved successfully.'));
                     } else {
                         res.status(ERROR);
                         res.json(successResponse(ERROR, {}, 'Invalid access token.'));
