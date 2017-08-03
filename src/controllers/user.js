@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import generatePassword from 'password-generator';
 import crypto from 'crypto';
 import config from "../../config.json";
-import { getSuccess, notFoundError, serverError, getSuccessMessage, validateEmail, successResponse } from "../modules/generic";
+import { getSuccess, notFoundError, serverError, getSuccessMessage, validateEmail, successResponse, mergeArray } from "../modules/generic";
 import { SUCCESS, ERROR } from "../modules/constant";
 import twilio from "../modules/twilio";
 import mail from "../modules/mail";
@@ -12,6 +12,7 @@ import constant from "../models/constant";
 import jwt from "jwt-simple";
 import { encodeToken } from "../modules/token";
 import token from "../modules/token";
+import async from "async";
 
 export class UserController extends BaseAPIController {
 
@@ -231,6 +232,8 @@ export class UserController extends BaseAPIController {
                     } else {
                         updatedData = { is_verify: 1 };
                     }
+
+                    console.log(updatedData)
                     updatedData.access_token = user.get('access_token')
                     User.update(UserModel, data, updatedData)
                         .then(() => {
@@ -480,6 +483,42 @@ export class UserController extends BaseAPIController {
         } else {
             res.status(ERROR);
             res.json(successResponse(ERROR, {}, 'access token missing.'));
+        }
+    }
+
+    getOtherUsers = (req, res) => {
+        let UserModel = req.User;
+        let { list } = req.body;
+        let follow = [];
+        let invite = [];
+        if (Array.isArray(list)) {
+            async.eachSeries(list, processData, function(err) {
+                if (err) {
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, err, 'Error.'));
+                } else {
+                    res.status(SUCCESS);
+                    res.json(successResponse(SUCCESS, { follow: follow, invite: invite }, 'get follow and invite Saved successfully.'));
+                }
+            })
+        } else {
+            res.status(ERROR);
+            res.json(successResponse(ERROR, {}, 'Invalid Array.'));
+        }
+
+        function processData(val, callback) {
+            UserModel.find({ $or: [{ "mobile": { $regex: val.mobile } }, { "email": { $regex: val.email } }] }, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1, "profile_picture_url": 1 }, function(err, response) {
+                if (err) {
+                    callback(err)
+                } else {
+                    if (response && response.length) {
+                        follow = mergeArray(follow, response)
+                    } else {
+                        invite.push(val)
+                    }
+                    callback(null);
+                }
+            })
         }
     }
 }

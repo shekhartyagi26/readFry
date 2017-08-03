@@ -50,6 +50,10 @@ const checkBlank = (arr) => {
     })
 };
 
+const mergeArray = (arr1 = [], arr2 = []) => {
+    return _(arr1).keyBy('_id').merge(_.keyBy(arr2, '_id')).values().value();
+}
+
 module.exports = {
     getSuccess,
     notFoundError,
@@ -57,5 +61,6 @@ module.exports = {
     getSuccessMessage,
     validateEmail,
     successResponse,
-    checkBlank
+    checkBlank,
+    mergeArray
 };
