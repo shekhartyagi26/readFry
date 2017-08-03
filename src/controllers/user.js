@@ -315,24 +315,27 @@ export class UserController extends BaseAPIController {
             User.findOne(UserModel, { user_name: user_name })
                 .then((userDetails) => {
                     if (userDetails) {
-                        res.status(SUCCESS)
+                        res.status(ERROR)
                         res.json(successResponse(ERROR, {}, 'Username has already exist.'));
                     } else {
-                        UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { "user_name": user_name, "status": 4 }, returnNewDocument: true }, (err, insertData) => {
+                        UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { "user_name": user_name, "status": 4 }, returnNewDocument: true }, { new: true }, (err, insertData) => {
+                            let response = { access_token: access_token, status: 4 }
                             if (err) {
                                 res.status(ERROR);
                                 res.json(successResponse(ERROR, err, 'Error.'));
                             } else {
                                 if (insertData) {
+                                    if (insertData.get('mobile')) {
+                                        response.mobile = insertData.get('mobile');
+                                    }
                                     res.status(SUCCESS);
-                                    res.json(successResponse(SUCCESS, { access_token: access_token, status: 4 }, 'UserName Saved successfully.'));
+                                    res.json(successResponse(SUCCESS, response, 'UserName Saved successfully.'));
                                 } else {
                                     res.status(ERROR);
                                     res.json(successResponse(ERROR, {}, 'Invalid access token.'));
                                 }
                             }
                         });
-
                     }
                 }).catch((e) => {
                     res.status(ERROR);
