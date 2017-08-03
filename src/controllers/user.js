@@ -37,13 +37,12 @@ export class UserController extends BaseAPIController {
             .then((user) => {
                 if (user) {
                     let access_token = encodeToken(user._id)
-                    UserModel.findOneAndUpdate(data, { $set: { "access_token": access_token }, returnNewDocument: true, upsert: true }, (err, insertData) => {
+                    UserModel.findOneAndUpdate(data, { $set: { "access_token": access_token }, returnNewDocument: true, upsert: true }, { new: true }, (err, insertData) => {
                         if (err) {
                             res.status(ERROR);
                             res.json(successResponse(ERROR, err, 'Error.'));
                         } else {
                             if (insertData) {
-                                insertData.access_token = access_token;
                                 delete insertData.get('password')
                                 res.status(SUCCESS);
                                 res.json(successResponse(SUCCESS, insertData, 'Logged in successfully.'));
