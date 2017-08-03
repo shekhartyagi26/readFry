@@ -451,7 +451,7 @@ export class UserController extends BaseAPIController {
     resetPassword = (req, res) => {
         let UserModel = req.User;
         let data;
-        let { email, password } = req.body;
+        let { mobile, email, password } = req.body;
         if (mobile && password) {
             data = { mobile: mobile }
         } else if (email && password) {
