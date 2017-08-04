@@ -118,11 +118,11 @@ export class UserController extends BaseAPIController {
                                                 res.json(successResponse(SUCCESS, { access_token: updatedData.access_token, status: 1, mobile: mobile }, 'An OTP has been sent,please verify.'));
                                             }).catch((e) => {
                                                 res.status(ERROR);
-                                                res.json(successResponse(ERROR, e, "You have entered a invalid Mobile Number."));
+                                                res.json(successResponse(ERROR, e, "Something Went Wrong."));
                                             })
                                     }).catch((e) => {
                                         res.status(ERROR);
-                                        res.json(successResponse(ERROR, e, 'Error.'));
+                                        res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
                                     })
                             } else {
                                 mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
@@ -262,8 +262,7 @@ export class UserController extends BaseAPIController {
         let { mobile, email } = req.body;
         const UserModel = req.User;
         let data = {};
-        if (mobile && country_code) {
-            country_code = countryCode(country_code);
+        if (mobile) {
             data = { mobile: mobile }
         } else if (email) {
             data = { email: email }
@@ -278,10 +277,11 @@ export class UserController extends BaseAPIController {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, {}, 'User not found.'));
                 } else {
+                    let country_code = user.get('country_code');
                     let verification_code = generateRandomString();
-                    // let verification_code = 123456;
                     let updatedData = { verification_code: verification_code }
                     if (mobile) {
+                        console.log(country_code+mobile)
                         twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
                             .then((result) => {
                                 User.update(UserModel, data, updatedData)
@@ -290,11 +290,11 @@ export class UserController extends BaseAPIController {
                                         res.json(successResponse(SUCCESS, '{}', 'An OTP has been sent,please verify.'));
                                     }).catch((e) => {
                                         res.status(ERROR);
-                                        res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number..'));
+                                        res.json(successResponse(ERROR, e, 'Something Went Wrong.'));
                                     })
                             }).catch((e) => {
                                 res.status(ERROR);
-                                res.json(successResponse(ERROR, e, 'Error.'));
+                                res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
                             })
                     } else {
                         mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
@@ -537,6 +537,47 @@ export class UserController extends BaseAPIController {
                     callback(null);
                 }
             })
+        }
+    }
+
+    changeMobile = (req, res) => {
+        let { access_token } = req.headers;
+        let { mobile, country_code } = req.body;
+        let UserModel = req.User;
+        if (access_token && mobile && country_code) {
+            User.findOne(UserModel, { access_token: access_token })
+                .then((user) => {
+                    if (user) {
+                        country_code = countryCode(country_code);
+                        let verification_code = generateRandomString();
+                        let updatedData = { verification_code: verification_code }
+                        updatedData.mobile = mobile;
+                        updatedData.country_code = country_code;
+                        twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
+                            .then((result) => {
+                                User.update(UserModel, { access_token: access_token }, updatedData)
+                                    .then((data) => {
+                                        res.status(SUCCESS)
+                                        res.json(successResponse(SUCCESS, { access_token: access_token }, 'An OTP has been sent,please verify.'));
+                                    }).catch((e) => {
+                                        res.status(ERROR);
+                                        res.json(successResponse(ERROR, e, "Something Went Wrong."));
+                                    })
+                            }).catch((e) => {
+                                res.status(ERROR);
+                                res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
+                            })
+                    } else {
+                        res.status(ERROR);
+                        res.json(successResponse(ERROR, {}, 'Invalid access token.'));
+                    }
+                }).catch((e) => {
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, {}, 'Something Went Wrong'));
+                })
+        } else {
+            res.status(ERROR);
+            res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
         }
     }
 }
