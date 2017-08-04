@@ -508,7 +508,7 @@ export class UserController extends BaseAPIController {
         }
 
         function processData(val, callback) {
-            UserModel.find({ $or: [{ "mobile": { $regex: val.mobile } }, { "email": { $regex: val.email } }] }, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1, "profile_picture_url": 1 }, function(err, response) {
+            UserModel.find({ $or: [{ "mobile": { $regex: val.mobile } }, { "email": { $regex: val.email } }] }, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1 }, function(err, response) {
                 if (err) {
                     callback(err)
                 } else {
