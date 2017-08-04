@@ -121,6 +121,7 @@ export class UserController extends BaseAPIController {
                                                 res.json(successResponse(ERROR, e, "Something Went Wrong."));
                                             })
                                     }).catch((e) => {
+                                        userData.remove();
                                         res.status(ERROR);
                                         res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
                                     })
@@ -184,11 +185,11 @@ export class UserController extends BaseAPIController {
                         User.save(UserModel, user)
                             .then((userData) => {
                                 let access_token = encodeToken(userData._id)
-                                userData.access_token = access_token
+                                userData.access_token = access_token;
                                 User.update(UserModel, { fb_id: fb_id }, { access_token: access_token })
-                                    .then(() => {
+                                    .then((resp) => {
                                         res.status(SUCCESS)
-                                        res.json(successResponse(SUCCESS, userData, 'Logged in successfully.'));
+                                        res.json(successResponse(SUCCESS, resp, 'Logged in successfully.'));
                                     }).catch((e) => {
                                         res.status(ERROR);
                                         res.json(successResponse(ERROR, e, 'Error.'));
