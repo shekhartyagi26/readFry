@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import generatePassword from 'password-generator';
 import crypto from 'crypto';
 import config from "../../config.json";
-import { getSuccess, notFoundError, serverError, getSuccessMessage, validateEmail, successResponse, mergeArray } from "../modules/generic";
+import { getSuccess, notFoundError, serverError, getSuccessMessage, validateEmail, successResponse, mergeArray, countryCode } from "../modules/generic";
 import { SUCCESS, ERROR } from "../modules/constant";
 import twilio from "../modules/twilio";
 import mail from "../modules/mail";
@@ -75,7 +75,8 @@ export class UserController extends BaseAPIController {
         }
         let data = {};
         let { mobile, email, password, country_code } = body.user;
-        if (mobile && password) {
+        if (mobile && password && country_code) {
+            country_code = countryCode(country_code);
             data = { mobile: mobile }
         } else if (email && password) {
             data = { email: email }
@@ -103,13 +104,12 @@ export class UserController extends BaseAPIController {
                     user_details.status = 1;
                     User.save(UserModel, user_details)
                         .then((userData) => {
-                            // let verification_code = Math.ceil(Math.random() * 10000);
-
-                            let verification_code = 123456;
+                            let verification_code = Math.ceil(Math.random() * 10000);
+                            // let verification_code = 123456;
                             let updatedData = { verification_code: verification_code }
                             updatedData.access_token = encodeToken(userData._id);
                             if (mobile) {
-                                twilio.sendMessageTwilio(`your Mypoty verification code is: ${verification_code}`, '+918126724591')
+                                twilio.sendMessageTwilio(`your Mypoty verification code is: ${verification_code}`, country_code + mobile)
                                     .then((result) => {
                                         User.update(UserModel, data, updatedData)
                                             .then((data) => {
@@ -255,7 +255,8 @@ export class UserController extends BaseAPIController {
         let { mobile, email } = req.body;
         const UserModel = req.User;
         let data = {};
-        if (mobile) {
+        if (mobile && country_code) {
+            country_code = countryCode(country_code);
             data = { mobile: mobile }
         } else if (email) {
             data = { email: email }
@@ -270,11 +271,11 @@ export class UserController extends BaseAPIController {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, {}, 'User not found.'));
                 } else {
-                    // let verification_code = Math.ceil(Math.random() * 10000);
-                    let verification_code = 123456;
+                    let verification_code = Math.ceil(Math.random() * 10000);
+                    // let verification_code = 123456;
                     let updatedData = { verification_code: verification_code }
                     if (mobile) {
-                        twilio.sendMessageTwilio(`your Mypoty verification code is: ${verification_code}`, '+918126724591')
+                        twilio.sendMessageTwilio(`your Mypoty verification code is: ${verification_code}`, country_code + mobile)
                             .then((result) => {
                                 User.update(UserModel, data, updatedData)
                                     .then(() => {

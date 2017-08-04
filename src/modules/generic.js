@@ -54,6 +54,13 @@ const mergeArray = (arr1 = [], arr2 = []) => {
     return _(arr1).keyBy('_id').merge(_.keyBy(arr2, '_id')).values().value();
 }
 
+const countryCode = (country_code) => {
+    if (!country_code.includes("+")) {
+        country_code = '+' + country_code
+    };
+    return country_code;
+}
+
 module.exports = {
     getSuccess,
     notFoundError,
@@ -62,5 +69,6 @@ module.exports = {
     validateEmail,
     successResponse,
     checkBlank,
-    mergeArray
+    mergeArray,
+    countryCode
 };
