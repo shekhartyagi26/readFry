@@ -13,6 +13,7 @@ import jwt from "jwt-simple";
 import { encodeToken } from "../modules/token";
 import token from "../modules/token";
 import async from "async";
+import _ from "lodash";
 
 export class UserController extends BaseAPIController {
 
@@ -508,12 +509,22 @@ export class UserController extends BaseAPIController {
         }
 
         function processData(val, callback) {
+            let result = [];
             UserModel.find({ $or: [{ "mobile": { $regex: val.mobile } }, { "email": { $regex: val.email } }] }, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1 }, function(err, response) {
                 if (err) {
                     callback(err)
                 } else {
                     if (response && response.length) {
-                        follow = mergeArray(follow, response)
+                        _.map(response, (val, key) => {
+                            let resp = {};
+                            resp.id = val._id;
+                            resp.email = val.get('email') || "";
+                            resp.mobile = val.get('mobile') || "";
+                            resp.full_name = val.get('full_name') || "";
+                            resp.profile_picture = val.get('profile_picture') && val.get('profile_picture').path || "";
+                            result.push(resp);
+                        })
+                        follow = mergeArray(follow, result)
                     } else {
                         invite.push(val)
                     }

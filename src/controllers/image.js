@@ -11,7 +11,7 @@ export class ImageController extends BaseAPIController {
             let path_name = req.file.originalname
             let type = req.file.mimetype
             let data = { "access_token": access_token };
-            UserModel.findOneAndUpdate(data, { $set: { profilePicture: req.file, status: 3 }, returnNewDocument: true, upsert: true }, (err, insertData) => {
+            UserModel.findOneAndUpdate(data, { $set: { profile_picture: req.file, status: 3 }, returnNewDocument: true, upsert: true }, (err, insertData) => {
                 if (err) {
                     fs.unlink(req.file.path, function() {
                         res.status(ERROR);
