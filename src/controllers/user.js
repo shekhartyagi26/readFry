@@ -275,7 +275,7 @@ export class UserController extends BaseAPIController {
             .then((user) => {
                 if (!user) {
                     res.status(ERROR);
-                    res.json(successResponse(ERROR, {}, 'User not found.'));
+                    res.json(successResponse(ERROR, {}, 'Please enter the registered email or mobile number.'));
                 } else {
                     let country_code = user.get('country_code');
                     let verification_code = generateRandomString();
@@ -305,7 +305,7 @@ export class UserController extends BaseAPIController {
                                         res.json(successResponse(SUCCESS, '{}', 'An Email has been sent,please verify.'));
                                     }).catch((e) => {
                                         res.status(ERROR);
-                                        res.json(successResponse(ERROR, e, 'Error.'));
+                                        res.json(successResponse(ERROR, e, 'Email not send successfully.'));
                                     })
                             })
                             .catch((e) => {
