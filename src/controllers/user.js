@@ -118,7 +118,7 @@ export class UserController extends BaseAPIController {
                                                 res.json(successResponse(SUCCESS, { access_token: updatedData.access_token, status: 1, mobile: mobile }, 'An OTP has been sent,please verify.'));
                                             }).catch((e) => {
                                                 res.status(ERROR);
-                                                res.json(successResponse(ERROR, e, 'Error.'));
+                                                res.json(successResponse(ERROR, e, "You have entered a invalid Mobile Number."));
                                             })
                                     }).catch((e) => {
                                         res.status(ERROR);
@@ -213,9 +213,9 @@ export class UserController extends BaseAPIController {
         const UserModel = req.User;
         let data = {};
         if (mobile && verification_code) {
-            data = { mobile: mobile, verification_code: Number(verification_code) }
+            data = { mobile: mobile }
         } else if (email && verification_code) {
-            data = { email: email, verification_code: Number(verification_code) }
+            data = { email: email }
         } else {
             res.status(ERROR)
             res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
@@ -233,17 +233,23 @@ export class UserController extends BaseAPIController {
                     } else {
                         updatedData = { is_verify: 1 };
                     }
-
-                    console.log(updatedData)
                     updatedData.access_token = user.get('access_token')
-                    User.update(UserModel, data, updatedData)
-                        .then(() => {
-                            res.status(SUCCESS);
-                            res.json(successResponse(SUCCESS, updatedData, 'OTP match successfully.'));
-                        }).catch((e) => {
+                    updatedData.verification_code = Number(verification_code)
+                    data.verification_code = Number(verification_code);
+                    UserModel.findOneAndUpdate(data, { $set: updatedData, returnNewDocument: true }, (err, insertData) => {
+                        if (err) {
                             res.status(ERROR);
-                            res.json(successResponse(ERROR, e, 'Error.'));
-                        })
+                            res.json(successResponse(ERROR, err, 'Error.'));
+                        } else {
+                            if (insertData) {
+                                res.status(SUCCESS);
+                                res.json(successResponse(SUCCESS, {}, 'OTP match successfully.'));
+                            } else {
+                                res.status(ERROR);
+                                res.json(successResponse(ERROR, {}, 'Invalid verification Code.'));
+                            }
+                        }
+                    });
                 }
             }).catch((e) => {
                 res.status(ERROR);
@@ -284,7 +290,7 @@ export class UserController extends BaseAPIController {
                                         res.json(successResponse(SUCCESS, '{}', 'An OTP has been sent,please verify.'));
                                     }).catch((e) => {
                                         res.status(ERROR);
-                                        res.json(successResponse(ERROR, e, 'Error.'));
+                                        res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number..'));
                                     })
                             }).catch((e) => {
                                 res.status(ERROR);
