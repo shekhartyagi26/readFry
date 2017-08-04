@@ -40,7 +40,32 @@ const findOne = (db, data) => {
     })
 };
 
+const save = (db, data) => {
+    let record = new db(data);
+    return new Promise((resolve, reject) => {
+        record.save((err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result)
+            }
+        })
+    })
+};
+const update = (db, checkData, updateData) => {
+    return new Promise((resolve, reject) => {
+        db.findOneAndUpdate(checkData, { $set: updateData }, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        })
+    })
+};
 export default {
     create,
     findOne,
+    save,
+    update,
 };
