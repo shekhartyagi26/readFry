@@ -281,7 +281,7 @@ export class UserController extends BaseAPIController {
                     let verification_code = generateRandomString();
                     let updatedData = { verification_code: verification_code }
                     if (mobile) {
-                        console.log(country_code+mobile)
+                        console.log(country_code + mobile)
                         twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
                             .then((result) => {
                                 User.update(UserModel, data, updatedData)
@@ -548,24 +548,35 @@ export class UserController extends BaseAPIController {
             User.findOne(UserModel, { access_token: access_token })
                 .then((user) => {
                     if (user) {
-                        country_code = countryCode(country_code);
-                        let verification_code = generateRandomString();
-                        let updatedData = { verification_code: verification_code }
-                        updatedData.mobile = mobile;
-                        updatedData.country_code = country_code;
-                        twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
-                            .then((result) => {
-                                User.update(UserModel, { access_token: access_token }, updatedData)
-                                    .then((data) => {
-                                        res.status(SUCCESS)
-                                        res.json(successResponse(SUCCESS, { access_token: access_token }, 'An OTP has been sent,please verify.'));
-                                    }).catch((e) => {
-                                        res.status(ERROR);
-                                        res.json(successResponse(ERROR, e, "Something Went Wrong."));
-                                    })
+                        User.findOne(UserModel, { mobile: mobile })
+                            .then((mobileData) => {
+                                if (mobileData) {
+                                    res.status(ERROR);
+                                    res.json(successResponse(ERROR, {}, 'Mobile Number already Exist.'));
+                                } else {
+                                    country_code = countryCode(country_code);
+                                    let verification_code = generateRandomString();
+                                    let updatedData = { verification_code: verification_code }
+                                    updatedData.mobile = mobile;
+                                    updatedData.country_code = country_code;
+                                    twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
+                                        .then((result) => {
+                                            User.update(UserModel, { access_token: access_token }, updatedData)
+                                                .then((data) => {
+                                                    res.status(SUCCESS)
+                                                    res.json(successResponse(SUCCESS, { access_token: access_token }, 'An OTP has been sent,please verify.'));
+                                                }).catch((e) => {
+                                                    res.status(ERROR);
+                                                    res.json(successResponse(ERROR, e, "Something Went Wrong."));
+                                                })
+                                        }).catch((e) => {
+                                            res.status(ERROR);
+                                            res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
+                                        })
+                                }
                             }).catch((e) => {
                                 res.status(ERROR);
-                                res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
+                                res.json(successResponse(ERROR, {}, 'Something Went Wrong'));
                             })
                     } else {
                         res.status(ERROR);
