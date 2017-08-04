@@ -61,6 +61,11 @@ const countryCode = (country_code) => {
     return country_code;
 }
 
+const generateRandomString = () => {
+    return Math.floor(1000 + Math.random() * 9000);
+}
+
+
 module.exports = {
     getSuccess,
     notFoundError,
@@ -70,5 +75,6 @@ module.exports = {
     successResponse,
     checkBlank,
     mergeArray,
-    countryCode
+    countryCode,
+    generateRandomString
 };
