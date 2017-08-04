@@ -369,23 +369,52 @@ export class UserController extends BaseAPIController {
             res.json(successResponse(ERROR, {}, 'User Details missing.'));
             return;
         }
+        let { mobile } = body.user;
         let UserModel = req.User;
         if (access_token) {
             user.status = 5;
-            UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, (err, insertData) => {
-                if (err) {
-                    res.status(ERROR);
-                    res.json(successResponse(ERROR, err, 'Error.'));
-                } else {
-                    if (insertData) {
-                        res.status(SUCCESS);
-                        res.json(successResponse(SUCCESS, { access_token: access_token, status: 5 }, 'UserName Saved successfully.'));
-                    } else {
+            if (mobile) {
+                User.findOne(UserModel, { mobile: mobile })
+                    .then((user) => {
+                        if (user) {
+                            res.status(ERROR);
+                            res.json(successResponse(ERROR, {}, 'Mobile Number already exist.'));
+                        } else {
+                            UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, (err, insertData) => {
+                                if (err) {
+                                    res.status(ERROR);
+                                    res.json(successResponse(ERROR, err, 'Error.'));
+                                } else {
+                                    if (insertData) {
+                                        res.status(SUCCESS);
+                                        res.json(successResponse(SUCCESS, { access_token: access_token, status: 5 }, 'UserName Saved successfully.'));
+                                    } else {
+                                        res.status(ERROR);
+                                        res.json(successResponse(ERROR, {}, 'Invalid access token.'));
+                                    }
+                                }
+                            });
+                        }
+                    }).catch((e) => {
                         res.status(ERROR);
-                        res.json(successResponse(ERROR, {}, 'Invalid access token.'));
+                        res.json(successResponse(ERROR, e, 'Something Went Wrong.'));
+                    })
+            } else {
+                UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, (err, insertData) => {
+                    if (err) {
+                        res.status(ERROR);
+                        res.json(successResponse(ERROR, err, 'Error.'));
+                    } else {
+                        if (insertData) {
+                            res.status(SUCCESS);
+                            res.json(successResponse(SUCCESS, { access_token: access_token, status: 5 }, 'UserName Saved successfully.'));
+                        } else {
+                            res.status(ERROR);
+                            res.json(successResponse(ERROR, {}, 'Invalid access token.'));
+                        }
                     }
-                }
-            });
+                });
+            }
         } else {
             res.status(ERROR);
             res.json(successResponse(ERROR, {}, 'access token missing.'));
