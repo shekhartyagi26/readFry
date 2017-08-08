@@ -132,7 +132,7 @@ export class UserController extends BaseAPIController {
                                         User.update(UserModel, data, updatedData)
                                             .then(() => {
                                                 res.status(SUCCESS)
-                                                res.json(successResponse(SUCCESS, { access_token: updatedData.access_token, status: 1, email: email }, 'An Email has been sent , please verify.'));
+                                                res.json(successResponse(SUCCESS, { access_token: updatedData.access_token, status: 1, email: email }, 'An OTP has been sent, Please verify.'));
                                             }).catch((e) => {
                                                 res.status(ERROR);
                                                 res.json(successResponse(ERROR, e, 'Error.'));
@@ -304,7 +304,7 @@ export class UserController extends BaseAPIController {
                                 User.update(UserModel, data, updatedData)
                                     .then(() => {
                                         res.status(SUCCESS);
-                                        res.json(successResponse(SUCCESS, '{}', 'An Email has been sent,please verify.'));
+                                        res.json(successResponse(SUCCESS, '{}', 'An OTP has been sent, Please verify.'));
                                     }).catch((e) => {
                                         res.status(ERROR);
                                         res.json(successResponse(ERROR, e, 'Email not send successfully.'));
@@ -402,6 +402,7 @@ export class UserController extends BaseAPIController {
                         res.json(successResponse(ERROR, e, 'Something Went Wrong.'));
                     })
             } else {
+                delete user[password]; 
                 UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, (err, insertData) => {
                     if (err) {
                         res.status(ERROR);

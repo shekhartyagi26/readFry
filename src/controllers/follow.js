@@ -138,6 +138,72 @@ export class ImageController extends BaseAPIController {
         }
     }
 
+     getFollowing = (req, res) => {
+        let { user_id } = req.params;
+        let { access_token } = req.headers;
+        let UserModel = req.User;
+        let followers = [];
+        let userFollower = [];
+        if (user_id && access_token) {
+            UserModel.findOne({ access_token: access_token }, { "following": 1 }, function(err, response) {
+                if (err) {
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, err, 'Error.'));
+                } else if (response) {
+                    userFollower = response.get('following');
+                    UserModel.findOne({ _id: user_id }, { "_id": 1, "following": 1 }, function(err, result) {
+                        if (err) {
+                            res.status(ERROR);
+                            res.json(successResponse(ERROR, err, 'Error.'));
+                        } else if (result) {
+                            if (result.get('following')) {
+                                async.eachSeries(result.get('following'), processData, function(err) {
+                                    if (err) {
+                                        res.status(ERROR);
+                                        res.json(successResponse(ERROR, err, 'Error.'));
+                                    } else {
+                                        res.status(SUCCESS);
+                                        res.json(successResponse(SUCCESS, followers, 'Get List of Followers Successfully.'));
+                                    }
+                                })
+                            } else {
+                                res.status(SUCCESS);
+                                res.json(successResponse(SUCCESS, followers, 'Get List of Followers Successfully.'));
+                            }
+                        } else {
+                            res.status(ERROR)
+                            res.json(successResponse(ERROR, {}, 'UserId missing.'));
+                        }
+                    })
+                } else {
+                    res.status(ERROR)
+                    res.json(successResponse(ERROR, {}, 'Invalid access_token.'));
+                }
+            });
+        } else {
+            res.status(ERROR)
+            res.json(successResponse(ERROR, {}, 'UserId missing.'));
+        }
+
+        function processData(user_id, callback) {
+            UserModel.findOne({ _id: user_id }, { "_id": 1, "user_name": 1, "profile_picture.path": 1 }, function(err, result) {
+                if (err) {
+                    callback();
+                } else {
+                    let followerId = result.get('_id');
+                    let resp = {};
+                    resp.user_id = result._id;
+                    resp.is_following = userFollower.includes(followerId.toString()) ? 1 : 0;
+                    resp.user_name = result.get('user_name') || "";
+                    resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
+                    followers.push(resp);
+                    callback();
+                }
+            });
+
+        }
+    }
+
 }
 
 const controller = new ImageController();
