@@ -24,11 +24,20 @@ export class ImageController extends BaseAPIController {
 
     postFollow = (req, res) => {
         let { access_token } = req.headers;
-        let { followers_id } = req.body;
+        let { followers_id, follow } = req.body;
         let UserModel = req.User;
+        let where = {};
+        let message = '';
         if (access_token && followers_id && Array.isArray(followers_id)) {
             _.each(followers_id, (val, key) => {
-                let where = { "$addToSet": { "follow": val }, returnNewDocument: true };
+                if (follow) {
+                    where = { "$addToSet": { "follow": val }, returnNewDocument: true };
+                    message = 'Followers Add Successfully.';
+                } else {
+                    where = { "$pull": { "follow": val }, returnNewDocument: true };
+                    message = 'Followers remove Successfully.';
+                }
+
                 UserModel.findOneAndUpdate({ access_token: access_token }, where).exec((err, insertData) => {
                     if (err) {
                         res.status(ERROR)
@@ -37,7 +46,7 @@ export class ImageController extends BaseAPIController {
                         if (insertData) {
                             if (key == (_.size(followers_id) - 1)) {
                                 res.status(SUCCESS);
-                                res.json(successResponse(SUCCESS, {}, 'Followers Add Successfully.'));
+                                res.json(successResponse(SUCCESS, {}, message));
                             }
                         } else {
                             res.status(ERROR);
