@@ -6,11 +6,12 @@ import async from 'async';
 
 export class ImageController extends BaseAPIController {
     getFollow = (req, res) => {
-        let { user_id, access_token } = req.params;
+        let { user_id } = req.params;
+        let { access_token } = req.headers;
         let UserModel = req.User;
         let followers = [];
         let userFollower = [];
-        if (user_id) {
+        if (user_id && access_token) {
             UserModel.findOne({ access_token: access_token }, { "follow": 1 }, function(err, response) {
                 if (err) {
                     res.status(ERROR);
@@ -32,7 +33,9 @@ export class ImageController extends BaseAPIController {
                                         res.json(successResponse(SUCCESS, followers, 'Get List of Followers Successfully.'));
                                     }
                                 })
-
+                            } else {
+                                res.status(SUCCESS);
+                                res.json(successResponse(SUCCESS, followers, 'Get List of Followers Successfully.'));
                             }
                         } else {
                             res.status(ERROR)
