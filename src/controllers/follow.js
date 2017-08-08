@@ -18,7 +18,7 @@ export class ImageController extends BaseAPIController {
                             if (err) {
                                 console.log(err);
                                 // res.json({ status: 0, msg: "OOPS! How is this possible?" });
-                            }else{
+                            } else {
                                 console.log()
                             }
                             res.json({ status: 1, msg: "Series Processing Done" });
@@ -43,29 +43,29 @@ export class ImageController extends BaseAPIController {
         let UserModel = req.User;
         let where = {};
         let message = '';
-        if (access_token && followers_id && Array.isArray(followers_id)) {
-                if (follow) {
-                    where = { "$addToSet": { "follow": followers_id }, returnNewDocument: true };
-                    message = 'Followers Add Successfully.';
-                } else {
-                    where = { "$pull": { "follow": followers_id }, returnNewDocument: true };
-                    message = 'Followers remove Successfully.';
-                }
+        if (access_token && followers_id) {
+            if (follow) {
+                where = { "$addToSet": { "follow": followers_id }, returnNewDocument: true };
+                message = 'Followers Add Successfully.';
+            } else {
+                where = { "$pull": { "follow": followers_id }, returnNewDocument: true };
+                message = 'Followers remove Successfully.';
+            }
 
-                UserModel.findOneAndUpdate({ access_token: access_token }, where).exec((err, insertData) => {
-                    if (err) {
-                        res.status(ERROR)
-                        res.json(successResponse(ERROR, err, 'Error.'));
+            UserModel.findOneAndUpdate({ access_token: access_token }, where).exec((err, insertData) => {
+                if (err) {
+                    res.status(ERROR)
+                    res.json(successResponse(ERROR, err, 'Error.'));
+                } else {
+                    if (insertData) {
+                        res.status(SUCCESS);
+                        res.json(successResponse(SUCCESS, {}, message));
                     } else {
-                        if (insertData) {
-                                res.status(SUCCESS);
-                                res.json(successResponse(SUCCESS, {}, message));
-                        } else {
-                            res.status(ERROR);
-                            res.json(successResponse(ERROR, {}, 'access_token not found.'));
-                        }
+                        res.status(ERROR);
+                        res.json(successResponse(ERROR, {}, 'access_token not found.'));
                     }
-                });
+                }
+            });
         } else {
             res.status(ERROR)
             res.json(successResponse(ERROR, {}, 'access_token missing.'));
