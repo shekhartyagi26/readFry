@@ -2,40 +2,72 @@ import BaseAPIController from "./BaseAPIController";
 import { successResponse } from "../modules/generic";
 import { SUCCESS, ERROR } from "../modules/constant";
 import _ from "lodash";
+import async from 'async';
 
 export class ImageController extends BaseAPIController {
     getFollow = (req, res) => {
-        let { user_id } = req.params;
+        let { user_id, access_token } = req.params;
         let UserModel = req.User;
+        let followers = [];
+        let userFollower = [];
         if (user_id) {
-            UserModel.findOne({ _id: user_id }, { "_id": 1, "follow": 1, "followers": 1 }, function(err, result) {
+            UserModel.findOne({ access_token: access_token }, { "follow": 1 }, function(err, response) {
                 if (err) {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, err, 'Error.'));
-                } else if (result) {
-                    if (result.get('follow')) {
-                        async.eachSeries(name, processData, function(err) {
-                            if (err) {
-                                console.log(err);
-                                // res.json({ status: 0, msg: "OOPS! How is this possible?" });
-                            } else {
-                                console.log()
+                } else if (response) {
+                    userFollower = response.get('follow');
+                    UserModel.findOne({ _id: user_id }, { "_id": 1, "follow": 1 }, function(err, result) {
+                        if (err) {
+                            res.status(ERROR);
+                            res.json(successResponse(ERROR, err, 'Error.'));
+                        } else if (result) {
+                            if (result.get('follow')) {
+                                async.eachSeries(result.get('follow'), processData, function(err) {
+                                    if (err) {
+                                        res.status(ERROR);
+                                        res.json(successResponse(ERROR, err, 'Error.'));
+                                    } else {
+                                        res.status(SUCCESS);
+                                        res.json(successResponse(SUCCESS, followers, 'Get List of Followers Successfully.'));
+                                    }
+                                })
+
                             }
-                            res.json({ status: 1, msg: "Series Processing Done" });
-                        })
-                    }
-                    res.status(SUCCESS);
-                    res.json(successResponse(SUCCESS, result, 'Get Followers Successfully.'));
+                        } else {
+                            res.status(ERROR)
+                            res.json(successResponse(ERROR, {}, 'UserId missing.'));
+                        }
+                    })
                 } else {
                     res.status(ERROR)
-                    res.json(successResponse(ERROR, {}, 'UserId missing.'));
+                    res.json(successResponse(ERROR, {}, 'Invalid access_token.'));
                 }
-            })
+            });
         } else {
             res.status(ERROR)
             res.json(successResponse(ERROR, {}, 'UserId missing.'));
         }
+
+        function processData(user_id, callback) {
+            UserModel.findOne({ _id: user_id }, { "_id": 1, "user_name": 1, "profile_picture.path": 1 }, function(err, result) {
+                if (err) {
+                    callback();
+                } else {
+                    let followerId = result.get('_id');
+                    let resp = {};
+                    resp.user_id = result._id;
+                    resp.is_following = userFollower.includes(followerId.toString()) ? 1 : 0;
+                    resp.user_name = result.get('user_name') || "";
+                    resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
+                    followers.push(resp);
+                    callback();
+                }
+            });
+
+        }
     }
+
     //controller for follow and unfollow by passing value 1 and 0
     postFollow = (req, res) => {
         let { access_token } = req.headers;
@@ -81,14 +113,12 @@ export class ImageController extends BaseAPIController {
                     res.json(successResponse(ERROR, err, 'Error.'));
                 } else if (result) {
                     let resp = {};
-
-                    // console.log(result.get('follow').length)
                     resp.user_name = result.get('user_name') || "";
-
-                    resp.profile_picture = result.get('profilePicture').path || "";
+                    resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
                     resp.profession = result.get('profession') || "";
                     resp.bio = result.get('bio') || "";
                     resp.email = result.get('email') || "";
+                    resp.website = "www.google.com";
                     resp.number_of_post = result.get('post') && result.get('post').length || 0;
                     resp.number_of_following = result.get('following') && result.get('following').length || 0;
                     resp.number_of_follower = result.get('follow') && result.get('follow').length || 0;
