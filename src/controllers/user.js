@@ -402,7 +402,9 @@ export class UserController extends BaseAPIController {
                         res.json(successResponse(ERROR, e, 'Something Went Wrong.'));
                     })
             } else {
-                delete user[password]; 
+                if (user.mobile) {
+                    delete user[mobile];
+                }
                 UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, (err, insertData) => {
                     if (err) {
                         res.status(ERROR);
@@ -586,7 +588,7 @@ export class UserController extends BaseAPIController {
                 } else {
                     if (response && response.length) {
                         _.map(response, (val, key) => {
-                            let follow = val._id ;                          
+                            let follow = val._id;
                             if (!userFollow.includes(follow.toString())) {
                                 let resp = {};
                                 resp.id = val._id;
