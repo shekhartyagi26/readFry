@@ -558,7 +558,7 @@ export class UserController extends BaseAPIController {
                 res.status(ERROR);
                 res.json(successResponse(ERROR, {}, 'parameter missing.'));
             }
-            
+
             UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1 }, function(err, response) {
                 if (err) {
                     callback(err)
@@ -634,6 +634,7 @@ export class UserController extends BaseAPIController {
             res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
         }
     }
+
 }
 
 const controller = new UserController();

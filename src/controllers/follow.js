@@ -6,14 +6,29 @@ import _ from "lodash";
 export class ImageController extends BaseAPIController {
     getFollow = (req, res) => {
         let { user_id } = req.params;
+        let UserModel = req.User;
         if (user_id) {
-            req.User.findOne({ _id: user_id }, { "_id": 1, "follow": 1, "followers": 1 }, function(err, result) {
+            UserModel.findOne({ _id: user_id }, { "_id": 1, "follow": 1, "followers": 1 }, function(err, result) {
                 if (err) {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, err, 'Error.'));
-                } else {
+                } else if (result) {
+                    if (result.get('follow')) {
+                        async.eachSeries(name, processData, function(err) {
+                            if (err) {
+                                console.log(err);
+                                // res.json({ status: 0, msg: "OOPS! How is this possible?" });
+                            }else{
+                                console.log()
+                            }
+                            res.json({ status: 1, msg: "Series Processing Done" });
+                        })
+                    }
                     res.status(SUCCESS);
                     res.json(successResponse(SUCCESS, result, 'Get Followers Successfully.'));
+                } else {
+                    res.status(ERROR)
+                    res.json(successResponse(ERROR, {}, 'UserId missing.'));
                 }
             })
         } else {
@@ -21,7 +36,7 @@ export class ImageController extends BaseAPIController {
             res.json(successResponse(ERROR, {}, 'UserId missing.'));
         }
     }
-
+    //controller for follow and unfollow by passing value 1 and 0
     postFollow = (req, res) => {
         let { access_token } = req.headers;
         let { followers_id, follow } = req.body;
@@ -29,12 +44,11 @@ export class ImageController extends BaseAPIController {
         let where = {};
         let message = '';
         if (access_token && followers_id && Array.isArray(followers_id)) {
-            _.each(followers_id, (val, key) => {
                 if (follow) {
-                    where = { "$addToSet": { "follow": val }, returnNewDocument: true };
+                    where = { "$addToSet": { "follow": followers_id }, returnNewDocument: true };
                     message = 'Followers Add Successfully.';
                 } else {
-                    where = { "$pull": { "follow": val }, returnNewDocument: true };
+                    where = { "$pull": { "follow": followers_id }, returnNewDocument: true };
                     message = 'Followers remove Successfully.';
                 }
 
@@ -44,17 +58,14 @@ export class ImageController extends BaseAPIController {
                         res.json(successResponse(ERROR, err, 'Error.'));
                     } else {
                         if (insertData) {
-                            if (key == (_.size(followers_id) - 1)) {
                                 res.status(SUCCESS);
                                 res.json(successResponse(SUCCESS, {}, message));
-                            }
                         } else {
                             res.status(ERROR);
                             res.json(successResponse(ERROR, {}, 'access_token not found.'));
                         }
                     }
                 });
-            })
         } else {
             res.status(ERROR)
             res.json(successResponse(ERROR, {}, 'access_token missing.'));
@@ -68,7 +79,7 @@ export class ImageController extends BaseAPIController {
                 if (err) {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, err, 'Error.'));
-                } else {
+                } else if (result) {
                     let resp = {};
 
                     // console.log(result.get('follow').length)
@@ -83,6 +94,9 @@ export class ImageController extends BaseAPIController {
                     resp.number_of_follower = result.get('follow') && result.get('follow').length || 0;
                     res.status(SUCCESS);
                     res.json(successResponse(SUCCESS, resp, 'Get Other User Profile Successfully.'));
+                } else {
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, {}, 'Invalid UserId.'));
                 }
             })
         } else {
