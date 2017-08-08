@@ -528,18 +528,38 @@ export class UserController extends BaseAPIController {
     getOtherUsers = (req, res) => {
         let UserModel = req.User;
         let { list } = req.body;
+        let { access_token } = req.headers;
         let follow = [];
         let invite = [];
+        let userFollow = [];
         if (Array.isArray(list)) {
-            async.eachSeries(list, processData, function(err) {
-                if (err) {
-                    res.status(ERROR);
-                    res.json(successResponse(ERROR, err, 'Error.'));
-                } else {
-                    res.status(SUCCESS);
-                    res.json(successResponse(SUCCESS, { follow: follow, invite: invite }, 'get follow and invite Saved successfully.'));
-                }
-            })
+            if (access_token) {
+                UserModel.findOne({ access_token: access_token }, { "follow": 1 }, (err, result) => {
+                    if (err) {
+                        res.status(ERROR);
+                        res.json(successResponse(ERROR, err, 'Error.'));
+                    } else if (result) {
+                        userFollow = result.get('follow') || "";
+                        async.eachSeries(list, processData, function(err) {
+                            if (err) {
+                                res.status(ERROR);
+                                res.json(successResponse(ERROR, err, 'Error.'));
+                            } else {
+                                res.status(SUCCESS);
+                                res.json(successResponse(SUCCESS, { follow: follow, invite: invite }, 'get follow and invite Saved successfully.'));
+                            }
+                        })
+                    } else {
+                        res.status(ERROR);
+                        res.json(successResponse(ERROR, {}, 'Invalid Access Token.'));
+                    }
+                })
+
+            } else {
+                res.status(ERROR);
+                res.json(successResponse(ERROR, {}, 'Access Token missing.'));
+            }
+
         } else {
             res.status(ERROR);
             res.json(successResponse(ERROR, {}, 'Invalid Array.'));
@@ -559,7 +579,7 @@ export class UserController extends BaseAPIController {
                 res.json(successResponse(ERROR, {}, 'parameter missing.'));
             }
 
-            UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1 }, function(err, response) {
+            UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1, "follow": 1 }, function(err, response) {
                 if (err) {
                     callback(err)
                 } else {
@@ -567,9 +587,12 @@ export class UserController extends BaseAPIController {
                         _.map(response, (val, key) => {
                             let resp = {};
                             resp.id = val._id;
+                            let follow = val.get('follow') || "";
                             resp.email = val.get('email') || "";
                             resp.mobile = val.get('mobile') || "";
                             resp.full_name = val.get('full_name') || "";
+                            resp.is_following = userFollow.includes(follow.toString()) ? 1 : 0;
+
                             resp.profile_picture = val.get('profile_picture') && val.get('profile_picture').path || "";
                             result.push(resp);
                         })
