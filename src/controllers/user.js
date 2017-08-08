@@ -585,16 +585,16 @@ export class UserController extends BaseAPIController {
                 } else {
                     if (response && response.length) {
                         _.map(response, (val, key) => {
-                            let resp = {};
-                            resp.id = val._id;
-                            let follow = val.get('follow') || "";
-                            resp.email = val.get('email') || "";
-                            resp.mobile = val.get('mobile') || "";
-                            resp.full_name = val.get('full_name') || "";
-                            resp.is_following = userFollow.includes(follow.toString()) ? 1 : 0;
-
-                            resp.profile_picture = val.get('profile_picture') && val.get('profile_picture').path || "";
-                            result.push(resp);
+                            if (!userFollow.includes(follow.toString())) {
+                                let resp = {};
+                                resp.id = val._id;
+                                let follow = val.get('follow') || "";
+                                resp.email = val.get('email') || "";
+                                resp.mobile = val.get('mobile') || "";
+                                resp.full_name = val.get('full_name') || "";
+                                resp.profile_picture = val.get('profile_picture') && val.get('profile_picture').path || "";
+                                result.push(resp);
+                            }
                         })
                         follow = mergeArray(follow, result)
                     } else {
