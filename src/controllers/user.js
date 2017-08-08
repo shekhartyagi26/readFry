@@ -74,6 +74,7 @@ export class UserController extends BaseAPIController {
             res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
             return;
         }
+
         let data = {};
         let { mobile, email, password, country_code } = body.user;
         if (mobile && password && country_code) {
@@ -546,7 +547,19 @@ export class UserController extends BaseAPIController {
 
         function processData(val, callback) {
             let result = [];
-            UserModel.find({ $or: [{ "mobile": { $regex: val.mobile } }, { "email": { $regex: val.email } }] }, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1 }, function(err, response) {
+            let where = {};
+            if (val && val.mobile && val.email) {
+                where = { $or: [{ "mobile": { $regex: val.mobile } }, { "email": { $regex: val.email } }] };
+            } else if (val && val.mobile) {
+                where = { $or: [{ "mobile": { $regex: val.mobile } }] }
+            } else if (val && val.email) {
+                where = { $or: [{ "email": { $regex: val.email } }] }
+            } else {
+                res.status(ERROR);
+                res.json(successResponse(ERROR, {}, 'parameter missing.'));
+            }
+            
+            UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1 }, function(err, response) {
                 if (err) {
                     callback(err)
                 } else {
