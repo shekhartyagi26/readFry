@@ -590,12 +590,11 @@ export class UserController extends BaseAPIController {
                 } else {
                     if (response && response.length) {
                         _.map(response, (val, key) => {
-                            console.log(val)
                             let follow = val._id;
                             let status = val.get('status') ? val.get('status') : 0;
                             if (!userFollow.includes(follow.toString()) && !(userFollowId.toString() == follow.toString()) && status == 6) {
                                 let resp = {};
-                                resp.id = val._id;
+                                resp._id = val._id;
                                 resp.email = val.get('email') || "";
                                 resp.mobile = val.get('mobile') || "";
                                 resp.full_name = val.get('full_name') || "";
