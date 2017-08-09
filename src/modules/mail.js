@@ -14,6 +14,7 @@ module.exports = {
                     pass: config.SMTP_PASS
                 }
             }));
+            console.log(mailer)
             mailer.sendMail({
                 from: from,
                 to: email,
