@@ -53,7 +53,7 @@ export class ImageController extends BaseAPIController {
         }
 
         function processData(user_id, callback) {
-            UserModel.findOne({ _id: user_id }, { "_id": 1, "user_name": 1, "profile_picture.path": 1 }, function(err, result) {
+            UserModel.findOne({ _id: user_id }, { "_id": 1, "full_name": 1, "profile_picture.path": 1 }, function(err, result) {
                 if (err) {
                     callback();
                 } else {
@@ -61,7 +61,7 @@ export class ImageController extends BaseAPIController {
                     let resp = {};
                     resp.user_id = result._id;
                     resp.is_follower = userFollower && userFollower.includes(followerId.toString()) ? 1 : 0;
-                    resp.user_name = result.get('user_name') || "";
+                    resp.full_name = result.get('full_name') || "";
                     resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
                     followers.push(resp);
                     callback();
@@ -186,15 +186,15 @@ export class ImageController extends BaseAPIController {
         }
 
         function processData(user_id, callback) {
-            UserModel.findOne({ _id: user_id }, { "_id": 1, "user_name": 1, "profile_picture.path": 1 }, function(err, result) {
+            UserModel.findOne({ _id: user_id }, { "_id": 1, "full_name": 1, "profile_picture.path": 1 }, function(err, result) {
                 if (err) {
                     callback();
                 } else {
                     let followerId = result.get('_id');
                     let resp = {};
-                    resp.user_id = result._id;
+                    resp.id = result._id;
                     resp.is_following = userFollowing && userFollowing.includes(followerId.toString()) ? 1 : 0;
-                    resp.user_name = result.get('user_name') || "";
+                    resp.full_name = result.get('full_name') || "";
                     resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
                     followers.push(resp);
                     callback();
