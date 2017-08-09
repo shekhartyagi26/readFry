@@ -143,14 +143,14 @@ export class ImageController extends BaseAPIController {
         let { access_token } = req.headers;
         let UserModel = req.User;
         let followers = [];
-        let userFollower = [];
+        let userFollowing = [];
         if (user_id && access_token) {
             UserModel.findOne({ access_token: access_token }, { "following": 1 }, function(err, response) {
                 if (err) {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, err, 'Error.'));
                 } else if (response) {
-                    userFollower = response.get('following');
+                    userFollowing = response.get('following');
                     UserModel.findOne({ _id: user_id }, { "_id": 1, "following": 1 }, function(err, result) {
                         if (err) {
                             res.status(ERROR);
@@ -193,7 +193,7 @@ export class ImageController extends BaseAPIController {
                     let followerId = result.get('_id');
                     let resp = {};
                     resp.user_id = result._id;
-                    resp.is_following = userFollower.includes(followerId.toString()) ? 1 : 0;
+                    resp.is_following = userFollowing && userFollowing.includes(followerId.toString()) ? 1 : 0;
                     resp.user_name = result.get('user_name') || "";
                     resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
                     followers.push(resp);
