@@ -25,11 +25,13 @@ module.exports = {
                 console.log(response);
                 if (error) {
                      console.log(error)
-                    reject("Email not send successfully");
+                     res.json({message: "Wrong"});
+                    // resolve("Email not send successfully");
                    
                 } else {
                     console.log(response)
-                    resolve({ message: "Email send successfully" });
+                    res.json({message: "send"});
+                    // resolve({ message: "Email send successfully" });
                 }
                 // mailer.close();
             });
