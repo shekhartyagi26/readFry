@@ -156,7 +156,7 @@ export class ImageController extends BaseAPIController {
                             res.status(ERROR);
                             res.json(successResponse(ERROR, err, 'Error.'));
                         } else if (result) {
-                            if (result.get('following')) {
+                            if (result.get('follow')) {
                                 async.eachSeries(result.get('follow'), processData, function(err) {
                                     if (err) {
                                         res.status(ERROR);
