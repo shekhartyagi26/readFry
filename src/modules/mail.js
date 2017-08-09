@@ -14,7 +14,7 @@ module.exports = {
                     pass: config.SMTP_PASS
                 }
             }));
-            console.log(mailer)
+            // console.log(mailer)
             mailer.sendMail({
                 from: from,
                 to: email,
@@ -22,6 +22,8 @@ module.exports = {
                 template: text,
                 html: html
             }, (error, response) => {
+                console.log(error);
+                console.log(response);
                 if (error) {
                     reject("Email not send successfully");
                     console.log(error)
