@@ -1,7 +1,7 @@
 import BaseAPIController from "./BaseAPIController";
 import { successResponse } from "../modules/generic";
 import { SUCCESS, ERROR } from "../modules/constant";
-import fs from "fs";
+var fs = require('fs')
 import mime from "mime";
 
 export class ImageController extends BaseAPIController {

@@ -67,6 +67,7 @@ export class UserController extends BaseAPIController {
 
     signUp = (req, res) => {
         var body = req.body;
+        console.log(body)
         var user_details = body.user;
         let UserModel = req.User;
         if (!user_details) {
@@ -111,37 +112,41 @@ export class UserController extends BaseAPIController {
                             let updatedData = { verification_code: verification_code }
                             updatedData.access_token = encodeToken(userData._id);
                             if (mobile) {
-                                twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
-                                    .then((result) => {
-                                        User.update(UserModel, data, updatedData)
-                                            .then((data) => {
-                                                res.status(SUCCESS)
-                                                res.json(successResponse(SUCCESS, { access_token: updatedData.access_token, status: 1, mobile: mobile }, 'An OTP has been sent,please verify.'));
-                                            }).catch((e) => {
-                                                res.status(ERROR);
-                                                res.json(successResponse(ERROR, e, "Something Went Wrong."));
-                                            })
-                                    }).catch((e) => {
-                                        userData.remove();
-                                        res.status(ERROR);
-                                        res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
-                                    })
+                                   res.json({message:'mobile number'})
+                                // twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
+                                //     .then((result) => {
+                                //         User.update(UserModel, data, updatedData)
+                                //             .then((data) => {
+                                //                 res.status(SUCCESS)
+                                //                 res.json(successResponse(SUCCESS, { access_token: updatedData.access_token, status: 1, mobile: mobile }, 'An OTP has been sent,please verify.'));
+                                //             }).catch((e) => {
+                                //                 res.status(ERROR);
+                                //                 res.json(successResponse(ERROR, e, "Something Went Wrong."));
+                                //             })
+                                //     }).catch((e) => {
+                                //         userData.remove();
+                                //         res.status(ERROR);
+                                //         res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
+                                //     })
                             } else {
-                                mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
-                                    .then((response) => {
-                                        User.update(UserModel, data, updatedData)
-                                            .then(() => {
-                                                res.status(SUCCESS)
-                                                res.json(successResponse(SUCCESS, { access_token: updatedData.access_token, status: 1, email: email }, 'An OTP has been sent, Please verify.'));
-                                            }).catch((e) => {
-                                                res.status(ERROR);
-                                                res.json(successResponse(ERROR, e, 'Error.'));
-                                            })
-                                    })
-                                    .catch((e) => {
-                                        res.status(ERROR);
-                                        res.json(successResponse(ERROR, e, 'Error.'));
-                                    });
+                                // res.status(SUCCESS)
+                                res.json({message:'mail'})
+                                // res.json(successResponse(SUCCESS, {'msg':'An OTP has been sent, Please verify.');
+                                // mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
+                                //     .then((response) => {
+                                //         User.update(UserModel, data, updatedData)
+                                //             .then(() => {
+                                //                 res.status(SUCCESS)
+                                //                 res.json(successResponse(SUCCESS, { access_token: updatedData.access_token, status: 1, email: email }, 'An OTP has been sent, Please verify.'));
+                                //             }).catch((e) => {
+                                //                 res.status(ERROR);
+                                //                 res.json(successResponse(ERROR, e, 'Error.'));
+                                //             })
+                                //     })
+                                //     .catch((e) => {
+                                //         res.status(ERROR);
+                                //         res.json(successResponse(ERROR, e, 'Error.'));
+                                //     });
                             }
                         }).catch((e) => {
                             res.status(ERROR);
