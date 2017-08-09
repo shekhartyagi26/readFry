@@ -214,7 +214,7 @@ export class ImageController extends BaseAPIController {
                     resp.is_following = userFollowing && userFollowing.includes(followerId.toString()) ? 1 : 0;
                     resp.full_name = result.get('full_name') || "";
                     resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
-                    resp.profile_picture_format = result.get('profile_picture') && result.get('profile_picture').format || "";
+                    resp.profile_picture_format = result.get('profile_picture') && result.get('profile_picture').format || 0;
                     followers.push(resp);
                     callback();
                 }

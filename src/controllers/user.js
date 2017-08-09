@@ -599,7 +599,7 @@ export class UserController extends BaseAPIController {
                                 resp.mobile = val.get('mobile') || "";
                                 resp.full_name = val.get('full_name') || "";
                                 resp.profile_picture = val.get('profile_picture') && val.get('profile_picture').path || "";
-                                resp.profile_picture_format = val.get('profile_picture') && val.get('profile_picture').format || "";
+                                resp.profile_picture_format = val.get('profile_picture') && val.get('profile_picture').format || 0;
                                 result.push(resp);
                             }
                         })
