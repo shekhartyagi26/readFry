@@ -60,7 +60,7 @@ export class ImageController extends BaseAPIController {
                     let followerId = result.get('_id');
                     let resp = {};
                     resp.user_id = result._id;
-                    resp.is_following = userFollower.includes(followerId.toString()) ? 1 : 0;
+                    resp.is_following = userFollower && userFollower.includes(followerId.toString()) ? 1 : 0;
                     resp.user_name = result.get('user_name') || "";
                     resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
                     followers.push(resp);
@@ -123,8 +123,8 @@ export class ImageController extends BaseAPIController {
                     resp.email = result.get('email') || "";
                     resp.website = "www.google.com";
                     resp.number_of_post = result.get('post') && result.get('post').length || 0;
-                    resp.number_of_following = result.get('following') && result.get('following').length || 0;
-                    resp.number_of_follower = result.get('follow') && result.get('follow').length || 0;
+                    resp.number_of_following = result.get('follow') && result.get('follow').length || 0;
+                    resp.number_of_follower = result.get('following') && result.get('following').length || 0;
                     res.status(SUCCESS);
                     res.json(successResponse(SUCCESS, resp, 'Get Other User Profile Successfully.'));
                 } else {
@@ -138,7 +138,7 @@ export class ImageController extends BaseAPIController {
         }
     }
 
-     getFollowing = (req, res) => {
+    getFollowing = (req, res) => {
         let { user_id } = req.params;
         let { access_token } = req.headers;
         let UserModel = req.User;
