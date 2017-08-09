@@ -14,43 +14,22 @@ module.exports = {
                     pass: config.SMTP_PASS
                 }
             }));
-            // console.log(mailer)
-            var mailOptions = {
+            mailer.sendMail({
                 from: from,
                 to: email,
                 subject: subject,
                 template: text,
                 html: html
-            };
-            let emailMessage = '';
-            mailer.sendMail(mailOptions, function(error, info) {
+            }, (error, response) => {
                 if (error) {
-                    emailMessage = "there was an error :-(, and it was this: " + error.message;
+                    reject("Email not send successfully");
+                    console.log(error)
                 } else {
-                    emailMessage = "Message sent: " + info.response;
+                    console.log(response)
+                    resolve({ message: "Email send successfully" });
                 }
-                resolve({ message: "Email send successfully" });
                 mailer.close();
             });
-
-            // mailer.sendMail({
-            //     from: from,
-            //     to: email,
-            //     subject: subject,
-            //     template: text,
-            //     html: html
-            // }, (error, response) => {
-            //     console.log(error);
-            //     console.log(response);
-            //     if (error) {
-            //         reject("Email not send successfully");
-            //         console.log(error)
-            //     } else {
-            //         console.log(response)
-            //         resolve({ message: "Email send successfully" });
-            //     }
-            //     mailer.close();
-            // });
         })
     }
 };
