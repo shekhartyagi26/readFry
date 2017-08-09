@@ -535,6 +535,7 @@ export class UserController extends BaseAPIController {
         let follow = [];
         let invite = [];
         let userFollow = [];
+        let userFollowId = '';
         if (Array.isArray(list)) {
             if (access_token) {
                 UserModel.findOne({ access_token: access_token }, { "follow": 1 }, (err, result) => {
@@ -542,6 +543,7 @@ export class UserController extends BaseAPIController {
                         res.status(ERROR);
                         res.json(successResponse(ERROR, err, 'Error.'));
                     } else if (result) {
+                        userFollowId = result.get('_id');
                         userFollow = result.get('follow') || "";
                         async.eachSeries(list, processData, function(err) {
                             if (err) {
@@ -589,7 +591,7 @@ export class UserController extends BaseAPIController {
                     if (response && response.length) {
                         _.map(response, (val, key) => {
                             let follow = val._id;
-                            if (!userFollow.includes(follow.toString())) {
+                            if (!userFollow.includes(follow.toString()) && !(userFollowId.toString() == follow.toString())) {
                                 let resp = {};
                                 resp.id = val._id;
                                 resp.email = val.get('email') || "";
