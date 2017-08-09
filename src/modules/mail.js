@@ -21,14 +21,16 @@ module.exports = {
                 template: text,
                 html: html
             }, (error, response) => {
-                if (error) {
-                    reject("Email not send successfully");
-                    console.log(error)
-                } else {
-                    console.log(response)
-                    resolve({ message: "Email send successfully" });
-                }
-                mailer.close();
+                console.log(error);
+                console.log(response);
+                // if (error) {
+                //     reject("Email not send successfully");
+                //     console.log(error)
+                // } else {
+                //     console.log(response)
+                //     resolve({ message: "Email send successfully" });
+                // }
+                // mailer.close();
             });
         })
     }
