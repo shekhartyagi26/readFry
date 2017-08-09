@@ -22,7 +22,9 @@ module.exports = {
             }, (error, response) => {
                 if (error) {
                     reject("Email not send successfully");
+                    console.log(error)
                 } else {
+                    console.log(response)
                     resolve({ message: "Email send successfully" });
                 }
                 mailer.close();
