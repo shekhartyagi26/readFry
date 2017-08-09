@@ -145,30 +145,30 @@ export class ImageController extends BaseAPIController {
         let followers = [];
         let userFollowing = [];
         if (user_id && access_token) {
-            UserModel.findOne({ access_token: access_token }, { "following": 1 }, function(err, response) {
+            UserModel.findOne({ access_token: access_token }, { "follow": 1 }, function(err, response) {
                 if (err) {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, err, 'Error.'));
                 } else if (response) {
-                    userFollowing = response.get('following');
-                    UserModel.findOne({ _id: user_id }, { "_id": 1, "following": 1 }, function(err, result) {
+                    userFollowing = response.get('follow');
+                    UserModel.findOne({ _id: user_id }, { "_id": 1, "follow": 1 }, function(err, result) {
                         if (err) {
                             res.status(ERROR);
                             res.json(successResponse(ERROR, err, 'Error.'));
                         } else if (result) {
                             if (result.get('following')) {
-                                async.eachSeries(result.get('following'), processData, function(err) {
+                                async.eachSeries(result.get('follow'), processData, function(err) {
                                     if (err) {
                                         res.status(ERROR);
                                         res.json(successResponse(ERROR, err, 'Error.'));
                                     } else {
                                         res.status(SUCCESS);
-                                        res.json(successResponse(SUCCESS, followers, 'Get List of Followers Successfully.'));
+                                        res.json(successResponse(SUCCESS, followers, 'Get List of Following Successfully.'));
                                     }
                                 })
                             } else {
                                 res.status(SUCCESS);
-                                res.json(successResponse(SUCCESS, followers, 'Get List of Followers Successfully.'));
+                                res.json(successResponse(SUCCESS, followers, 'Get List of Following Successfully.'));
                             }
                         } else {
                             res.status(ERROR)
