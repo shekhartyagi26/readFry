@@ -106,8 +106,8 @@ export class UserController extends BaseAPIController {
                     user_details.status = 1;
                     User.save(UserModel, user_details)
                         .then((userData) => {
-                            let verification_code = generateRandomString();
-                            // let verification_code = 123456;
+                            // let verification_code = generateRandomString();
+                            let verification_code = 123456;
                             let updatedData = { verification_code: verification_code }
                             updatedData.access_token = encodeToken(userData._id);
                             if (mobile) {
@@ -584,14 +584,16 @@ export class UserController extends BaseAPIController {
                 res.json(successResponse(ERROR, {}, 'parameter missing.'));
             }
 
-            UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1, "follow": 1 }, function(err, response) {
+            UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1, "follow": 1, "status": 1 }, function(err, response) {
                 if (err) {
                     callback(err)
                 } else {
                     if (response && response.length) {
                         _.map(response, (val, key) => {
+                            console.log(val)
                             let follow = val._id;
-                            if (!userFollow.includes(follow.toString()) && !(userFollowId.toString() == follow.toString())) {
+                            let status = val.get('status') ? val.get('status') : 0;
+                            if (!userFollow.includes(follow.toString()) && !(userFollowId.toString() == follow.toString()) && status == 6) {
                                 let resp = {};
                                 resp.id = val._id;
                                 resp.email = val.get('email') || "";
