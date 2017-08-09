@@ -76,25 +76,43 @@ export class ImageController extends BaseAPIController {
         let { access_token } = req.headers;
         let { followers_id, follow } = req.body;
         let UserModel = req.User;
-        let where = {};
+        let whereFollowers = {};
+        let whereFollowing = {};
         let message = '';
         if (access_token && followers_id) {
             if (follow) {
-                where = { "$addToSet": { "follow": followers_id }, returnNewDocument: true };
+                whereFollowers = { "$addToSet": { "follow": followers_id }, returnNewDocument: true };
                 message = 'Followers Add Successfully.';
             } else {
-                where = { "$pull": { "follow": followers_id }, returnNewDocument: true };
+                whereFollowers = { "$pull": { "follow": followers_id }, returnNewDocument: true };
                 message = 'Followers remove Successfully.';
             }
 
-            UserModel.findOneAndUpdate({ access_token: access_token }, where).exec((err, insertData) => {
+            UserModel.findOneAndUpdate({ access_token: access_token }, whereFollowers).exec((err, insertData) => {
                 if (err) {
                     res.status(ERROR)
                     res.json(successResponse(ERROR, err, 'Error.'));
                 } else {
                     if (insertData) {
-                        res.status(SUCCESS);
-                        res.json(successResponse(SUCCESS, {}, message));
+                        if (follow) {
+                            whereFollowing = { "$addToSet": { "following": insertData._id.toString() }, returnNewDocument: true };
+                        } else {
+                            whereFollowing = { "$pull": { "following": insertData._id.toString() }, returnNewDocument: true };
+                        }
+                        UserModel.findOneAndUpdate({ _id: followers_id }, whereFollowing).exec((err, insertData) => {
+                            if (err) {
+                                res.status(ERROR)
+                                res.json(successResponse(ERROR, err, 'Error.'));
+                            } else {
+                                if (insertData) {
+                                    res.status(SUCCESS);
+                                    res.json(successResponse(SUCCESS, {}, message));
+                                } else {
+                                    res.status(ERROR);
+                                    res.json(successResponse(ERROR, {}, 'Following Id not Found.'));
+                                }
+                            }
+                        });
                     } else {
                         res.status(ERROR);
                         res.json(successResponse(ERROR, {}, 'access_token not found.'));
