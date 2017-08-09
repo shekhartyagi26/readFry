@@ -204,7 +204,7 @@ export class ImageController extends BaseAPIController {
         }
 
         function processData(user_id, callback) {
-            UserModel.findOne({ _id: user_id }, { "_id": 1, "full_name": 1, "profile_picture.path": 1 }, function(err, result) {
+            UserModel.findOne({ _id: user_id }, { "_id": 1, "full_name": 1, "profile_picture.path": 1, "profile_picture.format": 1 }, function(err, result) {
                 if (err) {
                     callback();
                 } else {
@@ -214,6 +214,7 @@ export class ImageController extends BaseAPIController {
                     resp.is_following = userFollowing && userFollowing.includes(followerId.toString()) ? 1 : 0;
                     resp.full_name = result.get('full_name') || "";
                     resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
+                    resp.profile_picture_format = result.get('profile_picture') && result.get('profile_picture').format || "";
                     followers.push(resp);
                     callback();
                 }

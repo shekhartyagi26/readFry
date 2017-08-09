@@ -584,7 +584,7 @@ export class UserController extends BaseAPIController {
                 res.json(successResponse(ERROR, {}, 'parameter missing.'));
             }
 
-            UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1, "follow": 1, "status": 1 }, function(err, response) {
+            UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1, "profile_picture.format": 1, "follow": 1, "status": 1 }, function(err, response) {
                 if (err) {
                     callback(err)
                 } else {
@@ -599,6 +599,7 @@ export class UserController extends BaseAPIController {
                                 resp.mobile = val.get('mobile') || "";
                                 resp.full_name = val.get('full_name') || "";
                                 resp.profile_picture = val.get('profile_picture') && val.get('profile_picture').path || "";
+                                resp.profile_picture_format = val.get('profile_picture') && val.get('profile_picture').format || "";
                                 result.push(resp);
                             }
                         })
