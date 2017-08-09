@@ -94,6 +94,7 @@ export class UserController extends BaseAPIController {
                     res.status(ERROR)
                     res.json(successResponse(ERROR, {}, 'User already exist.'));
                 } else {
+                     console.log('11111111')
                     let md5 = crypto.createHash('md5');
                     md5.update(password);
                     let pass_md5 = md5.digest('hex');
@@ -107,11 +108,13 @@ export class UserController extends BaseAPIController {
                     user_details.status = 1;
                     User.save(UserModel, user_details)
                         .then((userData) => {
+                             console.log('22222222222')
                             // let verification_code = generateRandomString();
                             let verification_code = 123456;
                             let updatedData = { verification_code: verification_code }
                             updatedData.access_token = encodeToken(userData._id);
                             if (mobile) {
+                                 console.log('44444444444')
                                 twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
                                     .then((result) => {
                                         User.update(UserModel, data, updatedData)
@@ -128,6 +131,7 @@ export class UserController extends BaseAPIController {
                                         res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
                                     })
                             } else {
+                                console.log('33333333333')
                                 mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
                                     .then((response) => {
                                         User.update(UserModel, data, updatedData)
