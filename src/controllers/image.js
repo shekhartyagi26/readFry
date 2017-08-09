@@ -11,9 +11,11 @@ export class ImageController extends BaseAPIController {
             let path_name = req.file.originalname
             let type = req.file.mimetype
             let data = { "access_token": access_token };
+            let actualPath = req.file.path;
+            req.file.path = req.file.path.replace('uploads/', "");
             UserModel.findOneAndUpdate(data, { $set: { profile_picture: req.file, status: 3 }, returnNewDocument: true, upsert: true }, (err, insertData) => {
                 if (err) {
-                    fs.unlink(req.file.path, function() {
+                    fs.unlink(actualPath, function() {
                         res.status(ERROR);
                         res.json(successResponse(ERROR, err, 'Error.'));
                     })
@@ -24,7 +26,7 @@ export class ImageController extends BaseAPIController {
                         data.status = 3;
                         res.json(successResponse(SUCCESS, data, 'Image Upload Successfully.'));
                     } else {
-                        fs.unlink(req.file.path, function() {
+                        fs.unlink(actualPath, function() {
                             res.status(ERROR)
                             res.json(successResponse(ERROR, {}, 'Invalid Token.'));
                         })
@@ -33,7 +35,7 @@ export class ImageController extends BaseAPIController {
             });
         } else {
             if (req.file) {
-                fs.unlink(req.file.path, function() {
+                fs.unlink(actualPath, function() {
                     res.status(ERROR)
                     res.json(successResponse(ERROR, {}, 'Invalid Token.'));
                 })
