@@ -594,7 +594,7 @@ export class UserController extends BaseAPIController {
                             let status = val.get('status') ? val.get('status') : 0;
                             if (!userFollow.includes(follow.toString()) && !(userFollowId.toString() == follow.toString()) && status == 6) {
                                 let resp = {};
-                                resp._id = val._id;
+                                resp.id = val._id;
                                 resp.email = val.get('email') || "";
                                 resp.mobile = val.get('mobile') || "";
                                 resp.full_name = val.get('full_name') || "";

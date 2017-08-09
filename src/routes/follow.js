@@ -3,7 +3,7 @@ import follow from "../controllers/follow";
 export default (app) => {
 
     /* Route for get Follow */
-    app.route("/follow/getFollow/:user_id").get(follow.getFollow);
+    app.route("/follow/getFollowers/:user_id").get(follow.getFollow);
 
     /* Route for get Follow */
     app.route("/follow/getFollowing/:user_id").get(follow.getFollowing);
