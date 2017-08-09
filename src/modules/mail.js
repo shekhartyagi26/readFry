@@ -15,24 +15,42 @@ module.exports = {
                 }
             }));
             // console.log(mailer)
-            mailer.sendMail({
+            var mailOptions = {
                 from: from,
                 to: email,
                 subject: subject,
                 template: text,
                 html: html
-            }, (error, response) => {
-                console.log(error);
-                console.log(response);
+            };
+            let emailMessage = '';
+            mailer.sendMail(mailOptions, function(error, info) {
                 if (error) {
-                    reject("Email not send successfully");
-                    console.log(error)
+                    emailMessage = "there was an error :-(, and it was this: " + error.message;
                 } else {
-                    console.log(response)
-                    resolve({ message: "Email send successfully" });
+                    emailMessage = "Message sent: " + info.response;
                 }
+                resolve({ message: "Email send successfully" });
                 mailer.close();
             });
+
+            // mailer.sendMail({
+            //     from: from,
+            //     to: email,
+            //     subject: subject,
+            //     template: text,
+            //     html: html
+            // }, (error, response) => {
+            //     console.log(error);
+            //     console.log(response);
+            //     if (error) {
+            //         reject("Email not send successfully");
+            //         console.log(error)
+            //     } else {
+            //         console.log(response)
+            //         resolve({ message: "Email send successfully" });
+            //     }
+            //     mailer.close();
+            // });
         })
     }
 };
