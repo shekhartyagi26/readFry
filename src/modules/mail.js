@@ -23,13 +23,14 @@ module.exports = {
             }, (error, response) => {
                 console.log(error);
                 console.log(response);
-                // if (error) {
-                //     reject("Email not send successfully");
-                //     console.log(error)
-                // } else {
-                //     console.log(response)
-                //     resolve({ message: "Email send successfully" });
-                // }
+                if (error) {
+                     console.log(error)
+                    reject("Email not send successfully");
+                   
+                } else {
+                    console.log(response)
+                    resolve({ message: "Email send successfully" });
+                }
                 // mailer.close();
             });
         })
