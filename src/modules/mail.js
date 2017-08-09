@@ -23,16 +23,16 @@ module.exports = {
             }, (error, response) => {
                 console.log(error);
                 console.log(response);
-                if (error) {
-                     console.log(error)
-                     // res.json({message: "Wrong"});
-                    // resolve("Email not send successfully");
+                // if (error) {
+                //      console.log(error)
+                //      // res.json({message: "Wrong"});
+                //     // resolve("Email not send successfully");
                    
-                } else {
-                    console.log(response)
-                    // res.json({message: "send"});
-                    // resolve({ message: "Email send successfully" });
-                }
+                // } else {
+                //     console.log(response)
+                //     res.json({message: "send"});
+                //     // resolve({ message: "Email send successfully" });
+                // }
                 // mailer.close();
             });
         })
