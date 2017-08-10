@@ -380,7 +380,7 @@ export class UserController extends BaseAPIController {
         let UserModel = req.User;
         if (access_token) {
             user.status = 5;
-            if (mobile) {
+            if (mobile && mobile) {
                 User.findOne(UserModel, { mobile: mobile })
                     .then((user) => {
                         if (user) {
@@ -407,9 +407,19 @@ export class UserController extends BaseAPIController {
                         res.json(successResponse(ERROR, e, 'Something Went Wrong.'));
                     })
             } else {
+                console.log('========================')
+                console.log(user)
+                console.log('========================')
+                console.log('+++++++++++++++++++++++++++++')
+                console.log(user.mobile)
+                console.log('+++++++++++++++++++++++++++++')
                 if (user.mobile) {
                     delete user[mobile];
                 }
+                console.log('********************************')
+                console.log(user)
+                console.log('********************************')
+
                 UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, (err, insertData) => {
                     if (err) {
                         res.status(ERROR);
