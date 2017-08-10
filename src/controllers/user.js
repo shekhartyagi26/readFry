@@ -94,7 +94,7 @@ export class UserController extends BaseAPIController {
                     res.status(ERROR)
                     res.json(successResponse(ERROR, {}, 'User already exist.'));
                 } else {
-                     console.log('11111111')
+                    console.log('11111111')
                     let md5 = crypto.createHash('md5');
                     md5.update(password);
                     let pass_md5 = md5.digest('hex');
@@ -108,13 +108,13 @@ export class UserController extends BaseAPIController {
                     user_details.status = 1;
                     User.save(UserModel, user_details)
                         .then((userData) => {
-                             console.log('22222222222')
+                            console.log('22222222222')
                             // let verification_code = generateRandomString();
                             let verification_code = 123456;
                             let updatedData = { verification_code: verification_code }
                             updatedData.access_token = encodeToken(userData._id);
                             if (mobile) {
-                                 console.log('44444444444')
+                                console.log('44444444444')
                                 twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
                                     .then((result) => {
                                         User.update(UserModel, data, updatedData)
@@ -380,7 +380,7 @@ export class UserController extends BaseAPIController {
         let UserModel = req.User;
         if (access_token) {
             user.status = 5;
-            if (mobile && mobile) {
+            if (mobile) {
                 User.findOne(UserModel, { mobile: mobile })
                     .then((user) => {
                         if (user) {
@@ -407,19 +407,9 @@ export class UserController extends BaseAPIController {
                         res.json(successResponse(ERROR, e, 'Something Went Wrong.'));
                     })
             } else {
-                console.log('========================')
-                console.log(user)
-                console.log('========================')
-                console.log('+++++++++++++++++++++++++++++')
-                console.log(user.mobile)
-                console.log('+++++++++++++++++++++++++++++')
-                if (user.mobile) {
-                    delete user[mobile];
+                if (user && user.mobile) {
+                    user = _.omit(user, 'mobile')
                 }
-                console.log('********************************')
-                console.log(user)
-                console.log('********************************')
-
                 UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, (err, insertData) => {
                     if (err) {
                         res.status(ERROR);
