@@ -57,10 +57,10 @@ export class ImageController extends BaseAPIController {
                 if (err) {
                     callback();
                 } else {
-                    let followerId = result.get('_id');
+                    let followerId = result.get('_id').toString();
                     let resp = {};
                     resp.id = result._id;
-                    resp.is_following = userFollower && userFollower.includes(followerId.toString()) ? 1 : 0;
+                    resp.is_following = userFollower && userFollower.includes(followerId) ? 1 : 0;
                     resp.full_name = result.get('full_name') || "";
                     resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
                     followers.push(resp);
@@ -81,10 +81,10 @@ export class ImageController extends BaseAPIController {
         let message = '';
         if (access_token && followers_id) {
             if (follow) {
-                whereFollowers = { "$addToSet": { "follow": followers_id }, returnNewDocument: true };
+                whereFollowers = { "$addToSet": { "follow": followers_id.toString() }, returnNewDocument: true };
                 message = 'Followers Add Successfully.';
             } else {
-                whereFollowers = { "$pull": { "follow": followers_id }, returnNewDocument: true };
+                whereFollowers = { "$pull": { "follow": followers_id.toString() }, returnNewDocument: true };
                 message = 'Followers remove Successfully.';
             }
 
@@ -99,7 +99,7 @@ export class ImageController extends BaseAPIController {
                         } else {
                             whereFollowing = { "$pull": { "following": insertData._id.toString() }, returnNewDocument: true };
                         }
-                        UserModel.findOneAndUpdate({ _id: followers_id }, whereFollowing).exec((err, insertData) => {
+                        UserModel.findOneAndUpdate({ _id: ObjectId(followers_id) }, whereFollowing).exec((err, insertData) => {
                             if (err) {
                                 res.status(ERROR)
                                 res.json(successResponse(ERROR, err, 'Error.'));

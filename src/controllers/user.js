@@ -288,7 +288,6 @@ export class UserController extends BaseAPIController {
                     let verification_code = generateRandomString();
                     let updatedData = { verification_code: verification_code }
                     if (mobile) {
-                        console.log(country_code + mobile)
                         twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
                             .then((result) => {
                                 User.update(UserModel, data, updatedData)
