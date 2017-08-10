@@ -584,8 +584,9 @@ export class UserController extends BaseAPIController {
             } else if (val && val.email) {
                 where = { $or: [{ "email": { $regex: val.email } }] }
             } else {
-                res.status(ERROR);
-                res.json(successResponse(ERROR, {}, 'parameter missing.'));
+                return;
+                // res.status(ERROR);
+                // res.json(successResponse(ERROR, {}, 'parameter missing.'));
             }
 
             UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1, "profile_picture.format": 1, "follow": 1, "status": 1 }, function(err, response) {
