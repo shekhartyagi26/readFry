@@ -192,7 +192,7 @@ export class UserController extends BaseAPIController {
                                 res.json(successResponse(ERROR, e, 'Error.'));
                             } else {
                                 res.status(SUCCESS)
-                                res.json(successResponse(SUCCESS, user_details, 'Logged in successfully.'));
+                                res.json(successResponse(SUCCESS, response, 'Logged in successfully.'));
                             }
                         })
                     } else {
