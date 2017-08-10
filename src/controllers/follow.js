@@ -12,12 +12,12 @@ export class ImageController extends BaseAPIController {
         let followers = [];
         let userFollower = [];
         if (user_id && access_token) {
-            UserModel.findOne({ access_token: access_token }, { "following": 1 }, function(err, response) {
+            UserModel.findOne({ access_token: access_token }, { "follow": 1 }, function(err, response) {
                 if (err) {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, err, 'Error.'));
                 } else if (response) {
-                    userFollower = response.get('following');
+                    userFollower = response.get('follow');
                     UserModel.findOne({ _id: user_id }, { "_id": 1, "following": 1 }, function(err, result) {
                         if (err) {
                             res.status(ERROR);
