@@ -99,7 +99,7 @@ export class ImageController extends BaseAPIController {
                         } else {
                             whereFollowing = { "$pull": { "following": insertData._id.toString() }, returnNewDocument: true };
                         }
-                        UserModel.findOneAndUpdate({ _id: ObjectId(followers_id) }, whereFollowing).exec((err, insertData) => {
+                        UserModel.findOneAndUpdate({ _id: followers_id }, whereFollowing).exec((err, insertData) => {
                             if (err) {
                                 res.status(ERROR)
                                 res.json(successResponse(ERROR, err, 'Error.'));
