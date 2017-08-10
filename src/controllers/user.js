@@ -186,7 +186,7 @@ export class UserController extends BaseAPIController {
                 .then((user_details) => {
                     if (user_details) {
                         let access_token = encodeToken(user_details._id)
-                        UserModel.findOneAndUpdate({ fb_id: fb_id }, { $set: { access_token: access_token }, returnNewDocument: true }, (err, response) => {
+                        UserModel.findOneAndUpdate({ fb_id: fb_id }, { $set: { access_token: access_token }, { new: true } }, (err, response) => {
                             if (err) {
                                 res.status(ERROR);
                                 res.json(successResponse(ERROR, e, 'Error.'));
