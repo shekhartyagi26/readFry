@@ -182,15 +182,19 @@ export class UserController extends BaseAPIController {
             user.status = 2;
             const UserModel = req.User;
             var userObj = user;
-            let access_token = encodeToken(userData._id)
-            UserModel.findOneAndUpdate({ fb_id: fb_id }, { $set: { access_token: access_token }, returnNewDocument: true }, (err, insertData) => {
-                if (err) {
-                    res.status(ERROR);
-                    res.json(successResponse(ERROR, err, 'Error.'));
-                } else {
-                    if (insertData) {
-                        res.status(SUCCESS)
-                        res.json(successResponse(SUCCESS, user_details, 'Logged in successfully.'));
+            User.findOne(UserModel, { fb_id: fb_id })
+                .then((user_details) => {
+                    if (user_details) {
+                        let access_token = encodeToken(user_details._id)
+                        UserModel.findOneAndUpdate({ fb_id: fb_id }, { $set: { access_token: access_token }, returnNewDocument: true }, (err, response) => {
+                            if (err) {
+                                res.status(ERROR);
+                                res.json(successResponse(ERROR, e, 'Error.'));
+                            } else {
+                                res.status(SUCCESS)
+                                res.json(successResponse(SUCCESS, user_details, 'Logged in successfully.'));
+                            }
+                        })
                     } else {
                         User.save(UserModel, user)
                             .then((userData) => {
@@ -209,35 +213,10 @@ export class UserController extends BaseAPIController {
                                 res.json(successResponse(ERROR, e, 'Error.'));
                             })
                     }
-                }
-            });
-            // User.findOne(UserModel, { fb_id: fb_id })
-            //     .then((user_details) => {
-            //         if (user_details) {
-            //             res.status(SUCCESS)
-            //             res.json(successResponse(SUCCESS, user_details, 'Logged in successfully.'));
-            //         } else {
-            //             User.save(UserModel, user)
-            //                 .then((userData) => {
-            //                     let access_token = encodeToken(userData._id)
-            //                     userData.access_token = access_token;
-            //                     User.update(UserModel, { fb_id: fb_id }, { access_token: access_token })
-            //                         .then((resp) => {
-            //                             res.status(SUCCESS)
-            //                             res.json(successResponse(SUCCESS, resp, 'Logged in successfully.'));
-            //                         }).catch((e) => {
-            //                             res.status(ERROR);
-            //                             res.json(successResponse(ERROR, e, 'Error.'));
-            //                         })
-            //                 }).catch((e) => {
-            //                     res.status(ERROR);
-            //                     res.json(successResponse(ERROR, e, 'Error.'));
-            //                 })
-            //         }
-            //     }).catch((e) => {
-            //         res.status(ERROR);
-            //         res.json(successResponse(ERROR, e, 'Error.'));
-            //     })
+                }).catch((e) => {
+                    res.status(ERROR);
+                    res.json(successResponse(ERROR, e, 'Error.'));
+                })
         } else {
             res.status(ERROR)
             res.json(successResponse(ERROR, {}, 'Some parameter missing.'));
