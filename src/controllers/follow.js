@@ -211,12 +211,12 @@ export class ImageController extends BaseAPIController {
                     callback();
                 } else {
                     let followerId = result.get('_id').toString();
+                    let resp = {};
                     if (followingId.toString() == followerId) {
                         resp.id = ''
                     } else {
                         resp.id = result._id;
                     }
-                    let resp = {};
                     resp.is_following = userFollowing && userFollowing.includes(followerId) ? 1 : 0;
                     resp.full_name = result.get('full_name') || "";
                     resp.profile_picture = result.get('profile_picture') && result.get('profile_picture').path || "";
