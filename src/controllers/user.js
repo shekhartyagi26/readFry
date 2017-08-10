@@ -433,7 +433,7 @@ export class UserController extends BaseAPIController {
             }
         } else {
             res.status(ERROR);
-            res.json(successResponse(ERROR, {}, 'access token missing.'));
+            res.json(successResponse(ERROR, {}, 'Access token missing.'));
         }
     }
 
@@ -464,7 +464,7 @@ export class UserController extends BaseAPIController {
                 } else {
                     if (insertData) {
                         res.status(SUCCESS);
-                        res.json(successResponse(SUCCESS, { access_token: access_token, status: 6 }, 'User Interest Saved successfully.'));
+                        res.json(successResponse(SUCCESS, { access_token: access_token, status: 6 }, 'User interest Saved successfully.'));
                     } else {
                         res.status(ERROR);
                         res.json(successResponse(ERROR, {}, 'Invalid access token.'));
@@ -488,7 +488,7 @@ export class UserController extends BaseAPIController {
                 } else {
                     if (insertData) {
                         res.status(SUCCESS);
-                        res.json(successResponse(SUCCESS, {}, 'User Logout successfully.'));
+                        res.json(successResponse(SUCCESS, {}, 'User logout successfully.'));
                     } else {
                         res.status(ERROR);
                         res.json(successResponse(ERROR, {}, 'Invalid access token.'));
@@ -497,7 +497,7 @@ export class UserController extends BaseAPIController {
             });
         } else {
             res.status(ERROR);
-            res.json(successResponse(ERROR, {}, 'access token missing.'));
+            res.json(successResponse(ERROR, {}, 'Access token missing.'));
         }
     }
 
@@ -526,7 +526,7 @@ export class UserController extends BaseAPIController {
                 } else {
                     if (insertData) {
                         res.status(SUCCESS);
-                        res.json(successResponse(SUCCESS, {}, 'password changed successfully.'));
+                        res.json(successResponse(SUCCESS, {}, 'Password changed successfully.'));
                     } else {
                         res.status(ERROR);
                         res.json(successResponse(ERROR, {}, 'Invalid access token.'));
@@ -535,7 +535,7 @@ export class UserController extends BaseAPIController {
             });
         } else {
             res.status(ERROR);
-            res.json(successResponse(ERROR, {}, 'access token missing.'));
+            res.json(successResponse(ERROR, {}, 'Access token missing.'));
         }
     }
 
@@ -562,18 +562,18 @@ export class UserController extends BaseAPIController {
                                 res.json(successResponse(ERROR, err, 'Error.'));
                             } else {
                                 res.status(SUCCESS);
-                                res.json(successResponse(SUCCESS, { follow: follow, invite: invite }, 'get follow and invite Saved successfully.'));
+                                res.json(successResponse(SUCCESS, { follow: follow, invite: invite }, 'Get follow and invite saved successfully.'));
                             }
                         })
                     } else {
                         res.status(ERROR);
-                        res.json(successResponse(ERROR, {}, 'Invalid Access Token.'));
+                        res.json(successResponse(ERROR, {}, 'Invalid access token.'));
                     }
                 })
 
             } else {
                 res.status(ERROR);
-                res.json(successResponse(ERROR, {}, 'Access Token missing.'));
+                res.json(successResponse(ERROR, {}, 'Access token missing.'));
             }
 
         } else {
@@ -592,7 +592,7 @@ export class UserController extends BaseAPIController {
                 where = { $or: [{ "email": { $regex: val.email } }] }
             } else {
                 res.status(ERROR);
-                res.json(successResponse(ERROR, {}, 'parameter missing.'));
+                res.json(successResponse(ERROR, {}, 'Parameter missing.'));
                 return;
             }
 
@@ -637,7 +637,7 @@ export class UserController extends BaseAPIController {
                             .then((mobileData) => {
                                 if (mobileData) {
                                     res.status(ERROR);
-                                    res.json(successResponse(ERROR, {}, 'Mobile Number already Exist.'));
+                                    res.json(successResponse(ERROR, {}, 'Mobile number already exist.'));
                                 } else {
                                     country_code = countryCode(country_code);
                                     let verification_code = generateRandomString();
@@ -649,19 +649,19 @@ export class UserController extends BaseAPIController {
                                             User.update(UserModel, { access_token: access_token }, updatedData)
                                                 .then((data) => {
                                                     res.status(SUCCESS)
-                                                    res.json(successResponse(SUCCESS, { access_token: access_token }, 'An OTP has been sent,please verify.'));
+                                                    res.json(successResponse(SUCCESS, { access_token: access_token }, 'An OTP has been sent, please verify.'));
                                                 }).catch((e) => {
                                                     res.status(ERROR);
-                                                    res.json(successResponse(ERROR, e, "Something Went Wrong."));
+                                                    res.json(successResponse(ERROR, e, "Something went wrong."));
                                                 })
                                         }).catch((e) => {
                                             res.status(ERROR);
-                                            res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
+                                            res.json(successResponse(ERROR, e, 'You have entered a invalid mobile number.'));
                                         })
                                 }
                             }).catch((e) => {
                                 res.status(ERROR);
-                                res.json(successResponse(ERROR, {}, 'Something Went Wrong'));
+                                res.json(successResponse(ERROR, {}, 'Something went wrong'));
                             })
                     } else {
                         res.status(ERROR);
@@ -669,7 +669,7 @@ export class UserController extends BaseAPIController {
                     }
                 }).catch((e) => {
                     res.status(ERROR);
-                    res.json(successResponse(ERROR, {}, 'Something Went Wrong'));
+                    res.json(successResponse(ERROR, {}, 'Something went wrong'));
                 })
         } else {
             res.status(ERROR);
