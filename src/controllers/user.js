@@ -108,13 +108,11 @@ export class UserController extends BaseAPIController {
                     user_details.status = 1;
                     User.save(UserModel, user_details)
                         .then((userData) => {
-                            console.log('22222222222')
-                            // let verification_code = generateRandomString();
-                            let verification_code = 123456;
+                            let verification_code = generateRandomString();
+                            // let verification_code = 123456;
                             let updatedData = { verification_code: verification_code }
                             updatedData.access_token = encodeToken(userData._id);
                             if (mobile) {
-                                console.log('44444444444')
                                 twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
                                     .then((result) => {
                                         User.update(UserModel, data, updatedData)
@@ -293,8 +291,8 @@ export class UserController extends BaseAPIController {
                     res.json(successResponse(ERROR, {}, 'Please enter the registered email or mobile number.'));
                 } else {
                     let country_code = user.get('country_code');
-                    // let verification_code = generateRandomString();
-                    let verification_code = 123456;
+                    let verification_code = generateRandomString();
+                    // let verification_code = 123456;
                     let updatedData = { verification_code: verification_code }
                     if (mobile) {
                         twilio.sendMessageTwilio(`Please enter this verification code to verify: ${verification_code}`, country_code + mobile)
