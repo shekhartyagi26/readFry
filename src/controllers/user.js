@@ -591,37 +591,39 @@ export class UserController extends BaseAPIController {
             } else if (val && val.email) {
                 where = { $or: [{ "email": { $regex: val.email } }] }
             } else {
-                res.status(ERROR);
-                res.json(successResponse(ERROR, {}, 'Parameter missing.'));
-                return;
+                where = '';
             }
-
-            UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1, "profile_picture.format": 1, "follow": 1, "status": 1 }, function(err, response) {
-                if (err) {
-                    callback(err)
-                } else {
-                    if (response && response.length) {
-                        _.map(response, (val, key) => {
-                            let follow = val._id;
-                            let status = val.get('status') ? val.get('status') : 0;
-                            if (!userFollow.includes(follow.toString()) && !(userFollowId.toString() == follow.toString()) && status == 6) {
-                                let resp = {};
-                                resp.id = val._id;
-                                resp.email = val.get('email') || "";
-                                resp.mobile = val.get('mobile') || "";
-                                resp.full_name = val.get('full_name') || "";
-                                resp.profile_picture = val.get('profile_picture') && val.get('profile_picture').path || "";
-                                resp.profile_picture_format = val.get('profile_picture') && val.get('profile_picture').format || 0;
-                                result.push(resp);
-                            }
-                        })
-                        follow = mergeArray(follow, result)
+            if (where) {
+                UserModel.find(where, { "_id": 1, "mobile": 1, "email": 1, "full_name": 1, "profile_picture.path": 1, "profile_picture.format": 1, "follow": 1, "status": 1 }, function(err, response) {
+                    if (err) {
+                        callback(err)
                     } else {
-                        invite.push(val)
+                        if (response && response.length) {
+                            _.map(response, (val, key) => {
+                                let follow = val._id;
+                                let full_name = val.get('full_name') || "";
+                                let status = val.get('status') ? val.get('status') : 0;
+                                if (!userFollow.includes(follow.toString()) && !(userFollowId.toString() == follow.toString()) && status == 6 && full_name) {
+                                    let resp = {};
+                                    resp.id = val._id;
+                                    resp.email = val.get('email') || "";
+                                    resp.mobile = val.get('mobile') || "";
+                                    resp.full_name = full_name;
+                                    resp.profile_picture = val.get('profile_picture') && val.get('profile_picture').path || "";
+                                    resp.profile_picture_format = val.get('profile_picture') && val.get('profile_picture').format || 0;
+                                    result.push(resp);
+                                }
+                            })
+                            follow = mergeArray(follow, result)
+                        } else {
+                            invite.push(val)
+                        }
+                        callback(null);
                     }
-                    callback(null);
-                }
-            })
+                })
+            } else {
+                callback(null);
+            }
         }
     }
 
