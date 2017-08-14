@@ -585,15 +585,15 @@ export class UserController extends BaseAPIController {
             let result = [];
             let where = {};
             if (val && val.mobile && val.email && val.fb_id) {
-                where = { $or: [{ "mobile": { $regex: val.mobile } }, { "email": { $regex: val.email } }, { "fb_id": { $regex: val.fb_id } }] };
+                where = { $or: [{ "mobile": { $regex: val.mobile } }, { "email": { $regex: val.email } }, { "fb_id": { $regex: val.fb_id.toString() } }] };
             } else if (val && val.mobile && val.fb_id) {
-                where = { $or: [{ "mobile": { $regex: val.mobile } }, { "fb_id": { $regex: val.fb_id } }] };
+                where = { $or: [{ "mobile": { $regex: val.mobile } }, { "fb_id": { $regex: val.fb_id.toString() } }] };
             } else if (val && val.email && val.fb_id) {
-                where = { $or: [{ "email": { $regex: val.email } }, { "fb_id": { $regex: val.fb_id } }] };
+                where = { $or: [{ "email": { $regex: val.email } }, { "fb_id": { $regex: val.fb_id.toString() } }] };
             } else if (val && val.email && val.mobile) {
                 where = { $or: [{ "email": { $regex: val.email } }, { "mobile": { $regex: val.mobile } }] };
             } else if (val && val.fb_id) {
-                where = { $or: [{ "fb_id": { $regex: val.fb_id } }] };
+                where = { $or: [{ "fb_id": { $regex: val.fb_id.toString() } }] };
             } else if (val && val.email) {
                 where = { $or: [{ "email": { $regex: val.email } }] };
             } else if (val && val.mobile) {
