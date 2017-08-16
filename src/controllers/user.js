@@ -624,7 +624,9 @@ export class UserController extends BaseAPIController {
                             })
                             follow = mergeArray(follow, result)
                         } else {
-                            invite.push(val)
+                            if (!val.fb_id) {
+                                invite.push(val)
+                            }
                         }
                         callback(null);
                     }
