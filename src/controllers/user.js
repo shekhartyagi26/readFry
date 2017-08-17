@@ -393,14 +393,14 @@ export class UserController extends BaseAPIController {
                             res.status(ERROR);
                             res.json(successResponse(ERROR, {}, 'Mobile Number already exist.'));
                         } else {
-                            UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, { new: true }, (err, insertData) => {
+                            UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, (err, insertData) => {
                                 if (err) {
                                     res.status(ERROR);
                                     res.json(successResponse(ERROR, err, 'Error.'));
                                 } else {
                                     if (insertData) {
                                         res.status(SUCCESS);
-                                        res.json(successResponse(SUCCESS, insertData, 'UserName Saved successfully.'));
+                                        res.json(successResponse(SUCCESS, { access_token: access_token, status: 5 }, 'UserName Saved successfully.'));
                                     } else {
                                         res.status(ERROR);
                                         res.json(successResponse(ERROR, {}, 'Invalid access token.'));
@@ -416,14 +416,14 @@ export class UserController extends BaseAPIController {
                 if (user && user.mobile) {
                     user = _.omit(user, 'mobile')
                 }
-                UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, { new: true }, (err, insertData) => {
+                UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, (err, insertData) => {
                     if (err) {
                         res.status(ERROR);
                         res.json(successResponse(ERROR, err, 'Error.'));
                     } else {
                         if (insertData) {
                             res.status(SUCCESS);
-                            res.json(successResponse(SUCCESS, insertData, 'UserName Saved successfully.'));
+                            res.json(successResponse(SUCCESS, { access_token: access_token, status: 5 }, 'UserName Saved successfully.'));
                         } else {
                             res.status(ERROR);
                             res.json(successResponse(ERROR, {}, 'Invalid access token.'));
@@ -457,14 +457,14 @@ export class UserController extends BaseAPIController {
         }
         let UserModel = req.User;
         if (access_token) {
-            UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { user_interest: list, status: 6 }, returnNewDocument: true }, (err, insertData) => {
+            UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: { user_interest: list, status: 6 }, returnNewDocument: true }, { new: true }, (err, insertData) => {
                 if (err) {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, err, 'Error.'));
                 } else {
                     if (insertData) {
                         res.status(SUCCESS);
-                        res.json(successResponse(SUCCESS, { access_token: access_token, status: 6 }, 'User interest Saved successfully.'));
+                        res.json(successResponse(SUCCESS, insertData, 'User interest Saved successfully.'));
                     } else {
                         res.status(ERROR);
                         res.json(successResponse(ERROR, {}, 'Invalid access token.'));
