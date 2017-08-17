@@ -1,10 +1,9 @@
 import BaseAPIController from "./BaseAPIController";
 import { successResult } from "../modules/generic";
-import { SUCCESS_STATUS } from "../constant/status";
 import User from "../models/User.js";
-var fs = require('fs')
+import fs from 'fs';
 import mime from "mime";
-import { BAD_REQUEST_STATUS, PARAMETER_MISSING_STATUS } from '../constant/status';
+import { BAD_REQUEST_STATUS, SUCCESS_STATUS } from '../constant/status';
 
 
 export class profileController extends BaseAPIController {
@@ -28,13 +27,15 @@ export class profileController extends BaseAPIController {
         let { full_name, profession, dob, bio } = req.body;
         let checkData = { access_token: access_token };
         let updatedDate = {};
+        let actualPath = '';
         if (req.file) {
-            let actualPath = req.file.path;
+            actualPath = req.file.path;
             req.file.path = req.file.path.replace('uploads/', "");
             let typeOf = mime.lookup(actualPath);
             req.file.profile_picture_format = typeOf.includes('video') ? 1 : typeOf.includes('image') ? 2 : 0;
+            updatedDate.profile_picture = req.file;
         }
-        req.file ? updatedDate.profile_picture = req.file : updatedDate;
+
         full_name ? updatedDate.full_name = full_name : updatedDate;
         profession ? updatedDate.profession = profession : updatedDate;
         dob ? updatedDate.dob = dob : updatedDate;
@@ -43,8 +44,9 @@ export class profileController extends BaseAPIController {
         User.update(req.User, checkData, updatedDate).then((result) => {
             res.status(SUCCESS_STATUS).json(successResult(result))
         }).catch((e) => {
-            fs.unlink(actualPath);
-            res.status(BAD_REQUEST_STATUS).json(serverError(e));
+            fs.unlink(actualPath, function() {
+                res.status(BAD_REQUEST_STATUS).json(serverError(e));
+            })
         })
     }
 }

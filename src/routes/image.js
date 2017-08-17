@@ -1,9 +1,7 @@
 import image from "../controllers/image";
 import mkdirp from "mkdirp";
 import multer from "multer";
-import Grid from "gridfs-stream";
 import path from "path";
-import md5 from "md5";
 
 export default (app) => {
     var storage = multer.diskStorage({
