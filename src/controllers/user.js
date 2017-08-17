@@ -11,7 +11,6 @@ import mail from "../modules/mail";
 import constant from "../models/constant";
 import jwt from "jwt-simple";
 import { encodeToken } from "../modules/token";
-import token from "../modules/token";
 import async from "async";
 import _ from "lodash";
 
@@ -67,7 +66,6 @@ export class UserController extends BaseAPIController {
 
     signUp = (req, res) => {
         var body = req.body;
-        console.log(body)
         var user_details = body.user;
         let UserModel = req.User;
         if (!user_details) {
@@ -94,7 +92,6 @@ export class UserController extends BaseAPIController {
                     res.status(ERROR)
                     res.json(successResponse(ERROR, {}, 'User already exist.'));
                 } else {
-                    console.log('11111111')
                     let md5 = crypto.createHash('md5');
                     md5.update(password);
                     let pass_md5 = md5.digest('hex');
@@ -129,7 +126,6 @@ export class UserController extends BaseAPIController {
                                         res.json(successResponse(ERROR, e, 'You have entered a invalid Mobile Number.'));
                                     })
                             } else {
-                                console.log('33333333333')
                                 mail.sendMail(email, constant().nodeMailer.subject, constant().nodeMailer.text, config.nodeMailer_email, constant().nodeMailer.html + verification_code)
                                     .then((response) => {
                                         User.update(UserModel, data, updatedData)

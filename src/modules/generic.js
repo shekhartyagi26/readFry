@@ -104,6 +104,23 @@ const verifyData = (data = {}) => {
     return result;
 }
 
+const validate = (data = {}) => {
+    var result = {};
+    var resp = {};
+    var count = 0;
+    _.map(data, (val, key) => {
+        if (val && val.length) {
+            result[key] = val;
+        } else {
+            resp[key] = `${key} is missing`;
+        }
+    })
+    if (resp && _.size(resp)) {
+        return { status: false, data: resp };
+    } else {
+        return { status: true, data: result };
+    }
+}
 
 module.exports = {
     getSuccess,
@@ -119,5 +136,6 @@ module.exports = {
     successResult,
     invalidToken,
     parameterMissing,
-    verifyData
+    verifyData,
+    validate
 };

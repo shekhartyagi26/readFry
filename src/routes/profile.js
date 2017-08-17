@@ -18,7 +18,7 @@ export default (app) => {
         }
     });
     var upload = multer({ storage: storage });
-    app.post('/profile', auth.requiresLogin, upload.single('file'), profile.edit)
+    app.post('/editProfile', auth.requiresLogin, upload.single('file'), profile.edit)
 
     /* Route for get profile */
     app.route("/profile").get(auth.requiresLogin, profile.get);
