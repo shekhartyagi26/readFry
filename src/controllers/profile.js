@@ -1,5 +1,5 @@
 import BaseAPIController from "./BaseAPIController";
-import { successResult } from "../modules/generic";
+import { successResult, verifyData } from "../modules/generic";
 import User from "../models/User.js";
 import fs from 'fs';
 import mime from "mime";
@@ -28,6 +28,7 @@ export class profileController extends BaseAPIController {
         let checkData = { access_token: access_token };
         let updatedDate = {};
         let actualPath = '';
+        updatedDate = verifyData({ full_name, profession, dob, bio });
         if (req.file) {
             actualPath = req.file.path;
             req.file.path = req.file.path.replace('uploads/', "");
@@ -35,11 +36,6 @@ export class profileController extends BaseAPIController {
             req.file.profile_picture_format = typeOf.includes('video') ? 1 : typeOf.includes('image') ? 2 : 0;
             updatedDate.profile_picture = req.file;
         }
-
-        full_name ? updatedDate.full_name = full_name : updatedDate;
-        profession ? updatedDate.profession = profession : updatedDate;
-        dob ? updatedDate.dob = dob : updatedDate;
-        bio ? updatedDate.bio = bio : updatedDate;
 
         User.update(req.User, checkData, updatedDate).then((result) => {
             res.status(SUCCESS_STATUS).json(successResult(result))

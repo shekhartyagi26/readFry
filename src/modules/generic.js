@@ -93,6 +93,18 @@ const parameterMissing = (message = PARAMETER_MISSING_MESSAGE, response = {}) =>
     })
 };
 
+const verifyData = (data = {}) => {
+    var result = {};
+    var count = 0;
+    _.map(data, (val, key) => {
+        if (val && val.length) {
+            result[key] = val;
+        }
+    })
+    return result;
+}
+
+
 module.exports = {
     getSuccess,
     notFoundError,
@@ -106,5 +118,6 @@ module.exports = {
     generateRandomString,
     successResult,
     invalidToken,
-    parameterMissing
+    parameterMissing,
+    verifyData
 };
