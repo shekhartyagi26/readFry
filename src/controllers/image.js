@@ -1,5 +1,5 @@
 import BaseAPIController from "./BaseAPIController";
-import { successResponse } from "../modules/generic";
+import { successResponse, serverError } from "../modules/generic";
 import { SUCCESS, ERROR } from "../modules/constant";
 var fs = require('fs')
 import mime from "mime";
