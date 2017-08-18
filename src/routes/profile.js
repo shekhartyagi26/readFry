@@ -21,7 +21,7 @@ export default (app) => {
     app.post('/editProfile', auth.requiresLogin, upload.single('file'), profile.edit)
 
     /* Route for get profile */
-    app.route("/profile").get(auth.requiresLogin, profile.get);
+    app.route("/profile").post(auth.requiresLogin, profile.get);
 
     return app;
 };
