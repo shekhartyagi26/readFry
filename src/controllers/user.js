@@ -384,11 +384,12 @@ export class UserController extends BaseAPIController {
             user.status = 5;
             if (mobile) {
                 User.findOne(UserModel, { mobile: mobile })
-                    .then((user) => {
-                        if (user) {
+                    .then((userData) => {
+                        if (userData) {
                             res.status(ERROR);
                             res.json(successResponse(ERROR, {}, 'Mobile Number already exist.'));
                         } else {
+                            console.log(user)
                             UserModel.findOneAndUpdate({ "access_token": access_token }, { $set: user, returnNewDocument: true }, (err, insertData) => {
                                 if (err) {
                                     res.status(ERROR);
