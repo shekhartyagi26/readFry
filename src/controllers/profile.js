@@ -28,7 +28,8 @@ export class profileController extends BaseAPIController {
         let checkData = { access_token: access_token };
         let updatedDate = {};
         let actualPath = '';
-        updatedDate = verifyData({ full_name, profession, dob, bio });
+        updatedDate = verifyData({ full_name, profession, dob });
+        updatedDate.bio = bio || "";
         if (req.file) {
             actualPath = req.file.path;
             req.file.path = req.file.path.replace('uploads/', "");
