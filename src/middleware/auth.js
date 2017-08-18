@@ -5,7 +5,11 @@ export class AuthController {
 
     // middleware for logged in users
     requiresLogin(req, res, next) {
+        console.log('=================')
+        console.log(req.headers)
+        console.log('=================')
         let { access_token } = req.headers;
+
         if (access_token) {
             req.User.findOne({ access_token }, (error, user) => {
                 if (error) {
