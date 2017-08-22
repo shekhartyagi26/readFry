@@ -3,8 +3,7 @@ import User from "../models/User.js";
 import Topics from "../models/IntrestingTopics.js";
 import generatePassword from 'password-generator';
 import config from "../../config.json";
-import { successResult, verifyData, encodePassword, serverError, successResponse, mergeArray, countryCode, generateRandomString, validate, parameterMissing } from "../modules/generic";
-import { SUCCESS, ERROR } from "../modules/constant";
+import { successResult, verifyData, encodePassword, serverError, mergeArray, countryCode, generateRandomString, validate, parameterMissing } from "../modules/generic";
 import twilio from "../modules/twilio";
 import mail from "../modules/mail";
 import constant from "../models/constant";
@@ -12,7 +11,7 @@ import { encodeToken } from "../modules/token";
 import async from "async";
 import _ from "lodash";
 import { PARAMETER_MISSING_STATUS, BAD_REQUEST_STATUS, ALREADY_EXIST, SUCCESS_STATUS } from '../constant/status';
-import { USERNAME_EXIST, INVALID_LOGIN_MESSAGE, USER_EXIST, LOGIN_SUCCESSFULLY_MESSAGE, MOBILE_NUMBER_MESSAGE, OTP_MATCHED, INVALID_VERIFICATION_CODE, USER_LOGOUT_MESSAGE, PASSWORD_CHANGE_MESSAGE, INVALID_MOBILE_EMAIL, OTP_SENT, VERIFICATION_MESSAGE } from '../constant/message';
+import { USERNAME_EXIST, INVALID_ARRAY, INVALID_LOGIN_MESSAGE, USER_EXIST, LOGIN_SUCCESSFULLY_MESSAGE, MOBILE_NUMBER_MESSAGE, OTP_MATCHED, INVALID_VERIFICATION_CODE, USER_LOGOUT_MESSAGE, PASSWORD_CHANGE_MESSAGE, INVALID_MOBILE_EMAIL, OTP_SENT, VERIFICATION_MESSAGE } from '../constant/message';
 
 export class UserController extends BaseAPIController {
 
@@ -296,46 +295,25 @@ export class UserController extends BaseAPIController {
     getOtherUsers = (req, res) => {
         let UserModel = req.User;
         let { list } = req.body;
-        let { access_token } = req.headers;
         let follow = [];
         let invite = [];
         let userFollow = [];
         let userFollowId = '';
+        userFollowId = result.get('_id');
+        userFollow = result.get('follow') || "";
         if (Array.isArray(list)) {
-            if (access_token) {
-                UserModel.findOne({ access_token: access_token }, { "follow": 1 }, (err, result) => {
-                    if (err) {
-                        res.status(ERROR);
-                        res.json(successResponse(ERROR, err, 'Error.'));
-                    } else if (result) {
-                        userFollowId = result.get('_id');
-                        userFollow = result.get('follow') || "";
-                        async.eachSeries(list, processData, function(err) {
-                            if (err) {
-                                res.status(ERROR);
-                                res.json(successResponse(ERROR, err, 'Error.'));
-                            } else {
-                                res.status(SUCCESS);
-                                res.json(successResponse(SUCCESS, { follow: follow, invite: invite }, 'Get follow and invite saved successfully.'));
-                            }
-                        })
-                    } else {
-                        res.status(ERROR);
-                        res.json(successResponse(ERROR, {}, 'Invalid access token.'));
-                    }
-                })
-
-            } else {
-                res.status(ERROR);
-                res.json(successResponse(ERROR, {}, 'Access token missing.'));
-            }
-
+            async.eachSeries(list, processData, function(err) {
+                if (err) {
+                    res.status(BAD_REQUEST_STATUS).json(serverError(err));
+                } else {
+                    res.status(SUCCESS_STATUS).json(successResult({ follow, invite }));
+                }
+            })
         } else {
-            res.status(ERROR);
-            res.json(successResponse(ERROR, {}, 'Invalid Array.'));
+            res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(INVALID_ARRAY));
         }
 
-        function processData(val, callback) {
+        function processData(val = [], callback) {
             let result = [];
             let where = {};
             if (val && val.mobile && val.email && val.fb_id) {

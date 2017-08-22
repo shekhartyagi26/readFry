@@ -37,7 +37,7 @@ export default (app) => {
     app.route("/user/logout").post(auth.requiresLogin, user.logout);
 
     /* Route for logout */
-    app.route("/user/getOtherUsers").post(user.getOtherUsers);
+    app.route("/user/getOtherUsers").post(auth.requiresLogin, user.getOtherUsers);
 
     /* Route for change Mobile */
     app.route("/user/changeMobile").post(auth.requiresLogin, user.changeMobile);

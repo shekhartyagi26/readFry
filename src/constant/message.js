@@ -16,6 +16,7 @@ const MOBILE_NUMBER_MESSAGE = 'Mobile number already exists.';
 const PASSWORD_CHANGE_MESSAGE = 'Password changed successfully.';
 const INVALID_MOBILE_EMAIL = 'The mobile or email you entered is incorrect.';
 const VERIFICATION_MESSAGE = 'Please enter this verification code to verify: ';
+const INVALID_ARRAY = 'Invalid Array.';
 
 module.exports = {
     PARAMETER_MISSING_MESSAGE,
@@ -35,5 +36,6 @@ module.exports = {
     MOBILE_NUMBER_MESSAGE,
     PASSWORD_CHANGE_MESSAGE,
     INVALID_MOBILE_EMAIL,
-    VERIFICATION_MESSAGE
+    VERIFICATION_MESSAGE,
+    INVALID_ARRAY
 };
