@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { BAD_REQUEST_MESSAGE, SUCCESS_MESSAGE, INVALID_ACCESS_TOKEN_MESSAGE, PARAMETER_MISSING_MESSAGE } from '../constant/message';
 import crypto from 'crypto';
+import { ObjectID } from 'bson';
 
 const generateResponse = ({ status, message = null, description = null, data = {} }) => {
     return {
@@ -133,6 +134,16 @@ const encodePassword = (password = '') => {
     return pass_md5;
 }
 
+/*create unique id*/
+const createUniqueId = (start = '') => {
+    const id = new ObjectID();
+    return `${start}_${id.toString()}`;
+}
+
+const timeStamp = () => {
+    return Math.round(new Date().getTime() / 1000);
+}
+
 module.exports = {
     getSuccess,
     notFoundError,
@@ -149,5 +160,7 @@ module.exports = {
     parameterMissing,
     verifyData,
     validate,
-    encodePassword
+    encodePassword,
+    createUniqueId,
+    timeStamp
 };

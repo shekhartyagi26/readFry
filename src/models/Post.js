@@ -34,22 +34,8 @@ const update = (db, checkData, updateData) => {
     })
 };
 
-const find = (db, data) => {
-    return new Promise((resolve, reject) => {
-        db.find(data, function(err, user) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(user);
-            }
-        })
-    })
-};
-
-
 export default {
     findOne,
     save,
     update,
-    find
 };

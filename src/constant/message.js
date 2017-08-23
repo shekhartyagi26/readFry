@@ -17,6 +17,9 @@ const PASSWORD_CHANGE_MESSAGE = 'Password changed successfully.';
 const INVALID_MOBILE_EMAIL = 'The mobile or email you entered is incorrect.';
 const VERIFICATION_MESSAGE = 'Please enter this verification code to verify: ';
 const INVALID_ARRAY = 'Invalid Array.';
+const INVALID_POSTID = 'Invalid Post id.';
+const INVALID_COMMENTID = 'Invalid Comment id.';
+const INVALID_USERID = 'Invalid User id.';
 
 module.exports = {
     PARAMETER_MISSING_MESSAGE,
@@ -37,5 +40,8 @@ module.exports = {
     PASSWORD_CHANGE_MESSAGE,
     INVALID_MOBILE_EMAIL,
     VERIFICATION_MESSAGE,
-    INVALID_ARRAY
+    INVALID_ARRAY,
+    INVALID_POSTID,
+    INVALID_COMMENTID,
+    INVALID_USERID
 };

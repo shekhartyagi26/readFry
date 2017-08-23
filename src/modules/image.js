@@ -4,6 +4,7 @@ import path from "path";
 import mime from "mime";
 import fs from "fs";
 import { BAD_REQUEST_STATUS } from '../constant/status';
+import { createUniqueId } from "./generic";
 
 // image path for uploading image
 const STORAGE = (uploadPath = '') => {
@@ -35,8 +36,19 @@ const DELETE_IMAGE = (path) => {
     })
 }
 
+const DEFAULT_FILE = (file = {}) => {
+    let data = {};
+    data.actual_path = file.path;
+    data.post_url = file.path.replace('uploads/', "");
+    data.file_format = PROFILE_IMAGE_FORMAT(file.filename);
+    data.post_id = createUniqueId('POST');
+    data.time = new Date();
+    data.timestamp = Math.round(new Date().getTime() / 1000);
+    return data;
+}
 module.exports = {
     STORAGE,
     PROFILE_IMAGE_FORMAT,
-    DELETE_IMAGE
+    DELETE_IMAGE,
+    DEFAULT_FILE
 };
