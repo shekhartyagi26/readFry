@@ -19,6 +19,6 @@ export default (app) => {
 
     /*route for get comment by user*/
     app.get('/comment/commentByUser/:user_id', auth.requiresLogin, comment.commentByUser);
-
+    
     return app;
 };

@@ -48,8 +48,8 @@ module.exports = function() {
         req.Image = collection_model_image;
         req.Intresting_topics = collection_model_intresting_topics;
         req.Post = collection_model_post;
-        req.comment = collection_model_comment;
-        req.like = collection_model_like;
+        req.Comment = collection_model_comment;
+        req.Like = collection_model_like;
         next();
     };
 };

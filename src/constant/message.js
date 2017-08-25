@@ -20,6 +20,7 @@ const INVALID_ARRAY = 'Invalid Array.';
 const INVALID_POSTID = 'Invalid Post id.';
 const INVALID_COMMENTID = 'Invalid Comment id.';
 const INVALID_USERID = 'Invalid User id.';
+const INVALID_LIKERID = 'Invalid Liker id.';
 
 module.exports = {
     PARAMETER_MISSING_MESSAGE,
@@ -43,5 +44,6 @@ module.exports = {
     INVALID_ARRAY,
     INVALID_POSTID,
     INVALID_COMMENTID,
-    INVALID_USERID
+    INVALID_USERID,
+    INVALID_LIKERID
 };

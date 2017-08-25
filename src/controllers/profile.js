@@ -1,6 +1,6 @@
 import { BAD_REQUEST_STATUS, SUCCESS_STATUS } from '../constant/status';
 import { PROFILE_IMAGE_FORMAT, DELETE_IMAGE } from "../modules/image";
-import { successResult, verifyData,serverError } from "../modules/generic";
+import { successResult, verifyData, serverError } from "../modules/generic";
 import BaseAPIController from "./BaseAPIController";
 import User from "../models/User.js";
 import fs from 'fs';
@@ -20,6 +20,9 @@ export class profileController extends BaseAPIController {
         result.country_code = user.get('country_code') || "";
         result.dob = user.get('dob') || "";
         result.bio = user.get('bio') || "";
+        result.latitude = user.get('latitude') || "";
+        result.longitude = user.get('longitude') || "";
+        result.address = user.get('address') || "";
         res.status(SUCCESS_STATUS).json(successResult(result))
     }
 

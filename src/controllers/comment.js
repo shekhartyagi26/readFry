@@ -10,17 +10,17 @@ export class postController extends BaseAPIController {
         let { post_id, comment, comment_by_id } = req.body;
         let data = validate({ post_id, comment })
         if (data.status) {
-            User.findOne(req.post, { post_id }).then((result) => {
+            User.findOne(req.Post, { post_id }).then((result) => {
                 if (result) {
                     data = data.data;
                     data.user_id = req.user._id;
-                    data.comment_id = createUniqueId('comment');
+                    data.comment_id = createUniqueId('COMMENT');
                     data.post_id = post_id;
                     data.comment = comment;
                     data.created_at = new Date();
                     data.created_timestamp = timeStamp();
                     data.comment_by_id = comment_by_id;
-                    User.save(req.comment, data).then((result) => {
+                    User.save(req.Comment, data).then((result) => {
                         res.status(SUCCESS_STATUS).json(successResult(result))
                     }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
                 } else {
@@ -40,7 +40,7 @@ export class postController extends BaseAPIController {
             data = data.data;
             data.updated_at = new Date();
             data.update_timestamp = timeStamp();
-            User.update(req.comment, { comment_id }, data).then((result) => {
+            User.update(req.Comment, { comment_id }, data).then((result) => {
                 if (result) {
                     res.status(SUCCESS_STATUS).json(successResult(result));
                 } else {
@@ -56,7 +56,7 @@ export class postController extends BaseAPIController {
         let { comment_id } = req.params;
         let data = validate({ comment_id });
         if (data.status) {
-            User.findOne(req.comment, comment_id).then((result) => {
+            User.findOne(req.Comment, { comment_id }).then((result) => {
                 if (!result) {
                     res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(INVALID_COMMENTID));
                 } else {
@@ -72,12 +72,12 @@ export class postController extends BaseAPIController {
         let { comment_id } = req.params;
         let data = validate({ comment_id });
         if (data.status) {
-            User.findOne(req.comment, comment_id).then((result) => {
+            User.findOne(req.Comment, { comment_id }).then((result) => {
                 if (!result) {
                     res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(INVALID_COMMENTID));
                 } else {
                     result.remove();
-                    res.status(SUCCESS_STATUS).json(successResult(result));
+                    res.status(SUCCESS_STATUS).json(successResult());
                 }
             }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
         } else {
@@ -90,7 +90,7 @@ export class postController extends BaseAPIController {
         let { post_id } = req.params;
         let data = validate({ post_id });
         if (data.status) {
-            User.find(req.comment, post_id).then((result) => {
+            User.find(req.Comment, { post_id }).then((result) => {
                 if (!result || result.length == 0) {
                     res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(INVALID_POSTID));
                 } else {
@@ -107,7 +107,7 @@ export class postController extends BaseAPIController {
         let { user_id } = req.params;
         let data = validate({ user_id });
         if (data.status) {
-            User.find(req.comment, user_id).then((result) => {
+            User.find(req.Comment, { user_id }).then((result) => {
                 if (!result || result.length == 0) {
                     res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(INVALID_USERID));
                 } else {

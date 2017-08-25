@@ -11,12 +11,15 @@ export default (app) => {
     app.put('/post/:post_id', auth.requiresLogin, post.editPost);
 
     /*route for get post*/
-    app.get('/post/:post_id', auth.requiresLogin, post.getPost);
+    // app.get('/post/:post_id', auth.requiresLogin, post.getPost);
 
     /*route for delete post*/
     app.delete('/post/:post_id', auth.requiresLogin, post.deletePost);
 
     /*route for get post by user*/
     app.get('/post/postByUser/:user_id', auth.requiresLogin, post.postByUser);
+
+    /*route for get all user post*/
+    app.get('/post/getAllPost', auth.requiresLogin, post.getAllPost);
     return app;
 };

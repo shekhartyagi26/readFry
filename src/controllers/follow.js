@@ -128,7 +128,7 @@ export class ImageController extends BaseAPIController {
     getOtherUserProfile = (req, res) => {
         let { user_id } = req.params;
         if (user_id) {
-            req.User.findOne({ _id: user_id }, { "_id": 1, "user_name": 1, "follow": 1, "following": 1, "profession": 1, "email": 1, "bio": 1, "post": 1, "profile_picture.path": 1 }, function(err, result) {
+            req.User.findOne({ _id: user_id }, { "_id": 1, "user_name": 1, "follow": 1, "following": 1, "profession": 1, "email": 1, "bio": 1, "post": 1, "profile_picture.path": 1,"full_name":1 }, function(err, result) {
                 if (err) {
                     res.status(ERROR);
                     res.json(successResponse(ERROR, err, 'Error.'));
@@ -139,6 +139,7 @@ export class ImageController extends BaseAPIController {
                     resp.profession = result.get('profession') || "";
                     resp.bio = result.get('bio') || "";
                     resp.email = result.get('email') || "";
+                    resp.full_name = result.get('full_name') || "";
                     resp.website = "www.google.com";
                     resp.number_of_post = result.get('post') && result.get('post').length || 0;
                     resp.number_of_following = result.get('follow') && result.get('follow').length || 0;

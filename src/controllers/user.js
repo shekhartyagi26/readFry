@@ -121,13 +121,19 @@ export class UserController extends BaseAPIController {
                 user.modified_on = new Date();
                 user.status = 2;
                 User.save(UserModel, user).then((result) => {
-                    let access_token = encodeToken(userData._id)
+                    let access_token = encodeToken(result._id)
                     User.update(UserModel, { fb_id }, { access_token }).then((result) => {
                         res.status(SUCCESS_STATUS).json(successResult(result, LOGIN_SUCCESSFULLY_MESSAGE))
-                    }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
-                }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
+                    }).catch((e) => { console.log('1', e);
+                        res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
+                }).catch((e) => { console.log('2', e);
+                    res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
             }
-        }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
+        }).catch((e) => {
+            console.log('3')
+            console.log(e);
+            res.status(BAD_REQUEST_STATUS).json(serverError(e));
+        });
     }
 
     /*Controller for verify verification code*/
@@ -243,7 +249,7 @@ export class UserController extends BaseAPIController {
     intrestingTopics = (req, res) => {
         Topics.findOne(req.Intresting_topics, {}).then((topic) => {
             res.status(SUCCESS_STATUS).json(successResult(topic.get('interests')))
-        }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)) });
+        }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
     }
 
 
@@ -299,8 +305,8 @@ export class UserController extends BaseAPIController {
         let invite = [];
         let userFollow = [];
         let userFollowId = '';
-        userFollowId = result.get('_id');
-        userFollow = result.get('follow') || "";
+        userFollowId = req.User.get('_id');
+        userFollow = req.User.get('follow') || "";
         if (Array.isArray(list)) {
             async.eachSeries(list, processData, function(err) {
                 if (err) {

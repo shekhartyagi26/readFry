@@ -34,8 +34,22 @@ const update = (db, checkData, updateData) => {
     })
 };
 
+const updateOne = (db, checkData = {}, updateData) => {
+    return new Promise((resolve, reject) => {
+        db.update(checkData, updateData, function(err, result) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        })
+    })
+};
+
+
 export default {
     findOne,
     save,
     update,
+    updateOne
 };

@@ -1,34 +1,45 @@
 import { DELETE_IMAGE, DEFAULT_FILE } from "../modules/image";
-import { successResult, serverError, parameterMissing, validate } from "../modules/generic";
+import { successResult, serverError, parameterMissing, validate, timeStamp } from "../modules/generic";
 import { BAD_REQUEST_STATUS, SUCCESS_STATUS, PARAMETER_MISSING_STATUS } from '../constant/status';
-import { INVALID_POSTID, INVALID_USERID } from '../constant/message';
+import { INVALID_POSTID, INVALID_USERID, INVALID_LIKERID } from '../constant/message';
 import BaseAPIController from "./BaseAPIController";
-import User from "../models/Post.js";
-
+import Post from "../models/Post.js";
+import _ from "lodash";
 export class postController extends BaseAPIController {
+    
     likeUnlike = (req, res) => {
         let { liker_id, post_id } = req.body;
-        User.findOne(req.User, liker_id).then((result) => {
-            if (!result) {
-                res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(INVALID_USERID));
-            } else {
-                User.findOne(req.post, post_id).then((result) => {
-                    if (!result) {
-                        res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(INVALID_POSTID));
-                    } else {
-                        User.findOne(req.post, post_id).then((result) => {
-                            if (!result) {
-                                res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(INVALID_POSTID));
+        let data = validate({ liker_id, post_id });
+        if (data.status) {
+            Post.findOne(req.User, { _id: liker_id }).then((result) => {
+                if (result) {
+                    Post.findOne(req.Post, { post_id }).then((post) => {
+                        if (post) {
+                            let likes = post.get('like') || [];
+                            let haslikerId = likes.some(likes => likes['liker_id'] === liker_id)
+                            if (haslikerId) {
+                                data = { $pull: { like: { liker_id: '599e5e90b7606a131e41afc6' } } };
                             } else {
-
-                                // res.status(SUCCESS_STATUS).json(successResult(result));
+                                let resp = {};
+                                resp.liker_id = liker_id;
+                                resp.created_at = new Date();
+                                resp.created_timestamp = timeStamp();
+                                data = { $addToSet: { like: resp } };
                             }
-                        }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
-                        // res.status(SUCCESS_STATUS).json(successResult(result));
-                    }
-                }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
-            }
-        }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
+                            Post.updateOne(req.Post, { post_id }, data).then((response) => {
+                                res.status(SUCCESS_STATUS).json(successResult());
+                            }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
+                        } else {
+                            res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(INVALID_POSTID));
+                        }
+                    }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
+                } else {
+                    res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(INVALID_LIKERID));
+                }
+            }).catch((e) => { res.status(BAD_REQUEST_STATUS).json(serverError(e)); });
+        } else {
+            res.status(PARAMETER_MISSING_STATUS).json(parameterMissing(data.data));
+        }
     }
 
     // editPost = (req, res) => {
