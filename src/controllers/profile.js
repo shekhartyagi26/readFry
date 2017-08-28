@@ -28,11 +28,11 @@ export class profileController extends BaseAPIController {
 
     edit = (req, res) => {
         let { access_token } = req.headers;
-        let { full_name, profession, dob, bio } = req.body;
+        let { full_name, profession, dob, bio, latitude, longitude, address } = req.body;
         let checkData = { access_token: access_token };
         let updatedDate = {};
         let actualPath = '';
-        updatedDate = verifyData({ full_name, profession, dob });
+        updatedDate = verifyData({ full_name, profession, dob, latitude, longitude, address });
         updatedDate.bio = bio || "";
         if (req.file) {
             actualPath = req.file.path;

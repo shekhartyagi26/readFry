@@ -305,8 +305,8 @@ export class UserController extends BaseAPIController {
         let invite = [];
         let userFollow = [];
         let userFollowId = '';
-        userFollowId = req.User.get('_id');
-        userFollow = req.User.get('follow') || "";
+        userFollowId = req.user.get('_id');
+        userFollow = req.user.get('follow') || "";
         if (Array.isArray(list)) {
             async.eachSeries(list, processData, function(err) {
                 if (err) {

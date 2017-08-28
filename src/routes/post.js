@@ -5,7 +5,7 @@ import { STORAGE } from "../modules/image";
 
 export default (app) => {
     /*route for create post*/
-    app.post('/post', auth.requiresLogin, multer({ storage: STORAGE('post') }).single('file'), post.createPost);
+    app.post('/post/createPost', auth.requiresLogin, multer({ storage: STORAGE('post') }).single('file'), post.createPost);
 
     /*route for edit post*/
     app.put('/post/:post_id', auth.requiresLogin, post.editPost);

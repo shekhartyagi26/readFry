@@ -100,7 +100,7 @@ const verifyData = (data = {}) => {
     var result = {};
     var count = 0;
     _.map(data, (val, key) => {
-        if (val && val.length) {
+        if (val && val.length || _.isInteger(val)) {
             result[key] = val;
         }
     })
@@ -113,7 +113,7 @@ const validate = (data = {}) => {
     var resp = {};
     var count = 0;
     _.map(data, (val, key) => {
-        if (val && val.length) {
+        if (val && val.length || _.isInteger(val)) {
             result[key] = val;
         } else {
             resp[key] = `${key} is missing`;
