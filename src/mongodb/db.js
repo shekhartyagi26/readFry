@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-let conn = mongoose.createConnection("mongodb://localhost/mipoty");
+let conn = mongoose.createConnection("mongodb://localhost/read_fry");
 // the middleware function
 module.exports = function() {
     // create schema
@@ -9,47 +9,47 @@ module.exports = function() {
     });
     let collection_model_user = conn.model('user', model_schema_user);
 
-    let model_schema_image = mongoose.Schema({}, {
-        strict: false,
-        collection: 'image'
-    });
-    let collection_model_image = conn.model('image', model_schema_image);
+    // let model_schema_image = mongoose.Schema({}, {
+    //     strict: false,
+    //     collection: 'image'
+    // });
+    // let collection_model_image = conn.model('image', model_schema_image);
 
 
-    let model_intresting_topics = mongoose.Schema({}, {
+    let model_interest = mongoose.Schema({}, {
         strict: false,
-        collection: 'intresting_topics'
+        collection: 'interest'
     });
-    let collection_model_intresting_topics = conn.model('intresting_topics', model_intresting_topics);
+    let collection_model_interest = conn.model('interest', model_interest);
 
     /*model for user_post*/
-    let model_post = mongoose.Schema({}, {
+    let model_article = mongoose.Schema({}, {
         strict: false,
-        collection: 'post'
+        collection: 'article'
     });
-    let collection_model_post = conn.model('post', model_post);
+    let collection_model_article = conn.model('post', model_article);
 
-    /*model for comment*/
-    let model_comment = mongoose.Schema({}, {
-        strict: false,
-        collection: 'comment'
-    });
-    let collection_model_comment = conn.model('comment', model_comment);
+    // /*model for comment*/
+    // let model_comment = mongoose.Schema({}, {
+    //     strict: false,
+    //     collection: 'comment'
+    // });
+    // let collection_model_comment = conn.model('comment', model_comment);
 
-    /*model for like*/
-    let model_like = mongoose.Schema({}, {
-        strict: false,
-        collection: 'like'
-    });
-    let collection_model_like = conn.model('like', model_like);
+    // /*model for like*/
+    // let model_like = mongoose.Schema({}, {
+    //     strict: false,
+    //     collection: 'like'
+    // });
+    // let collection_model_like = conn.model('like', model_like);
 
     return function(req, res, next) {
         req.User = collection_model_user;
-        req.Image = collection_model_image;
-        req.Intresting_topics = collection_model_intresting_topics;
-        req.Post = collection_model_post;
-        req.Comment = collection_model_comment;
-        req.Like = collection_model_like;
+        // req.Image = collection_model_image;
+        req.Interest = collection_model_interest;
+        req.Article = collection_model_article;
+        // req.Comment = collection_model_comment;
+        // req.Like = collection_model_like;
         next();
     };
 };

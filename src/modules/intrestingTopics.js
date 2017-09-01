@@ -1,10 +1,10 @@
 var _ = require('lodash');
 var mongoose = require('mongoose')
-var conn_pg_catalog_urls = mongoose.createConnection('mongodb://127.0.0.1/mipoty');
+var conn_pg_catalog_urls = mongoose.createConnection('mongodb://127.0.0.1/read_fry');
 
 var schema_intresting_topics = mongoose.Schema({}, {
     strict: false,
-    collection: 'intresting_topics'
+    collection: 'interest'
 });
 var conn_intresting_topics = conn_pg_catalog_urls.model('intresting_topics', schema_intresting_topics);
 var topics = {

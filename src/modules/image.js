@@ -41,9 +41,6 @@ const DEFAULT_FILE = (file = {}) => {
     data.actual_path = file.path;
     data.post_url = file.path.replace('uploads/', "");
     data.file_format = PROFILE_IMAGE_FORMAT(file.filename);
-    data.post_id = createUniqueId('POST');
-    data.time = new Date();
-    data.timestamp = Math.round(new Date().getTime() / 1000);
     return data;
 }
 module.exports = {

@@ -134,6 +134,10 @@ const encodePassword = (password = '') => {
     return pass_md5;
 }
 
+const encodeEmail = (email = '') => {
+    return crypto.createHash('md5').update(email).digest("hex")
+}
+
 /*create unique id*/
 const createUniqueId = (start = '') => {
     const id = new ObjectID();
@@ -162,5 +166,6 @@ module.exports = {
     validate,
     encodePassword,
     createUniqueId,
-    timeStamp
+    timeStamp,
+    encodeEmail
 };

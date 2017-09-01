@@ -7,7 +7,7 @@ const USERNAME_EXIST = 'Username has already exist.';
 const BAD_REQUEST_MESSAGE = 'Something Went Wrong.';
 const OTP_MATCHED = 'OTP match successfully.';
 const INVALID_VERIFICATION_CODE = 'Invalid verification Code.';
-const OTP_SENT = 'An OTP has been sent,please verify.';
+const OTP_SENT = 'An email has been sent,please verify.';
 const VALID_DETAILS = 'Please enter the valid details.';
 const USER_LOGOUT_MESSAGE = 'User logout successfully.';
 const SUCCESS_MESSAGE = 'Success.';
@@ -21,6 +21,7 @@ const INVALID_POSTID = 'Invalid Post id.';
 const INVALID_COMMENTID = 'Invalid Comment id.';
 const INVALID_USERID = 'Invalid User id.';
 const INVALID_LIKERID = 'Invalid Liker id.';
+const INVALID_LOGIN_TYPE = 'Invalid Login type.';
 
 module.exports = {
     PARAMETER_MISSING_MESSAGE,
@@ -45,5 +46,6 @@ module.exports = {
     INVALID_POSTID,
     INVALID_COMMENTID,
     INVALID_USERID,
-    INVALID_LIKERID
+    INVALID_LIKERID,
+    INVALID_LOGIN_TYPE
 };

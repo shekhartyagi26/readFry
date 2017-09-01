@@ -1,5 +1,7 @@
 import user from "../controllers/user";
 import auth from "../middleware/auth";
+import multer from "multer";
+import { STORAGE } from "../modules/image";
 
 export default (app) => {
 
@@ -7,40 +9,22 @@ export default (app) => {
     app.route("/user/login").post(user.login);
 
     /* Route for create Account */
-    app.route("/user/signUp").post(user.signUp);
-
-    /* Route for Social login and create */
-    app.route("/user/socialLogin").post(user.socialLogin);
-
-    /* Route for verify OTP */
-    app.route("/user/verifyCode").post(user.verifyCode);
+    app.route("/user/create").post(user.create);
 
     /* Route for forgot Password */
     app.route("/user/forgotPassword").post(user.forgotPassword);
 
-    /* Route for create UserName */
-    app.route("/user/createUserName").post(auth.requiresLogin, user.createUserName);
+    /* Route for verify email */
+    app.route("/user/verifyEmail").post(user.verifyEmail);
 
-    /* Route for save Personal Details */
-    app.route("/user/savePersonalDetails").post(auth.requiresLogin, user.savePersonalDetails);
-
-    /* Route for get intresets */
-    app.route("/user/getInterests").get(user.intrestingTopics);
-
-    /* Route for save Personal Details */
-    app.route("/user/saveInterest").post(auth.requiresLogin, user.saveInterest);
-
-    /* Route for logout */
+    /* Route for reset Password */
     app.route("/user/resetPassword").post(user.resetPassword);
 
     /* Route for logout */
     app.route("/user/logout").post(auth.requiresLogin, user.logout);
 
-    /* Route for logout */
-    app.route("/user/getOtherUsers").post(auth.requiresLogin, user.getOtherUsers);
-
-    /* Route for change Mobile */
-    app.route("/user/changeMobile").post(auth.requiresLogin, user.changeMobile);
+    /*Route for upload profile picture and edit profile*/
+    app.post('/user/editProfile', auth.requiresLogin, multer({ storage: STORAGE('profile') }).single('file'), user.editProfile)
 
     return app;
 };
